@@ -526,15 +526,37 @@ class Repo extends ChangeNotifier {
   }
 
   /// Total per bulan (1..12) untuk satu tahun.
-  Future<Map<int, Totals>> monthlyTotals(int year) async {
+  Future<Map<int, Totals>> monthlyTotals(
+    int year, {
+    int? assetId,
+    int? tagId,
+  }) async {
     final db = await _d.db;
+    final whereArgs = <Object?>[];
+    final conditions = <String>['t.date >= ?', 't.date <= ?'];
+    whereArgs.add('$year-01-01');
+    whereArgs.add('$year-12-31');
+
+    String joinClause = '';
+    if (tagId != null) {
+      joinClause += ' JOIN transaction_tags tt ON tt.transaction_id = t.id AND tt.tag_id = ?';
+      whereArgs.add(tagId);
+    }
+
+    if (assetId != null) {
+      conditions.add('t.asset_id = ?');
+      whereArgs.add(assetId);
+    }
+
+    final where = conditions.join(' AND ');
     final rows = await db.rawQuery('''
-      SELECT CAST(substr(date, 6, 2) AS INTEGER) AS m,
-        COALESCE(SUM(CASE WHEN type = 'income' THEN amount ELSE 0 END), 0) AS inc,
-        COALESCE(SUM(CASE WHEN type = 'expense' THEN amount ELSE 0 END), 0) AS exp
-      FROM transactions WHERE date >= ? AND date <= ?
+      SELECT CAST(substr(t.date, 6, 2) AS INTEGER) AS m,
+        COALESCE(SUM(CASE WHEN t.type = 'income' THEN t.amount ELSE 0 END), 0) AS inc,
+        COALESCE(SUM(CASE WHEN t.type = 'expense' THEN t.amount ELSE 0 END), 0) AS exp
+      FROM transactions t $joinClause
+      WHERE $where
       GROUP BY m
-    ''', ['$year-01-01', '$year-12-31']);
+    ''', whereArgs);
     return {
       for (final r in rows)
         r['m'] as int: Totals(r['inc'] as int, r['exp'] as int),

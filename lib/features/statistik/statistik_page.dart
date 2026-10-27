@@ -6,6 +6,7 @@ import '../../core/format.dart';
 import '../../core/widgets.dart';
 import '../../data/models.dart';
 import '../../data/repository.dart';
+import 'tren_bulanan_view.dart';
 
 enum StatMode { month, week, year, range }
 
@@ -55,6 +56,7 @@ class StatistikPage extends StatefulWidget {
 }
 
 class _StatistikPageState extends State<StatistikPage> {
+  int _subTab = 0; // 0: Kategori, 1: Tren Bulanan
   StatMode _mode = StatMode.month;
   DateTime _anchor = DateTime.now();
   DateTimeRange? _range;
@@ -193,7 +195,9 @@ class _StatistikPageState extends State<StatistikPage> {
               ListTile(
                 leading: const Icon(Icons.all_inclusive),
                 title: const Text('Semua Aset'),
-                trailing: _filterAssetId == null ? const Icon(Icons.check, color: Colors.teal) : null,
+                trailing: _filterAssetId == null
+                    ? const Icon(Icons.check, color: Colors.teal)
+                    : null,
                 onTap: () {
                   setState(() {
                     _filterAssetId = null;
@@ -210,9 +214,12 @@ class _StatistikPageState extends State<StatistikPage> {
                     final a = nonArchived[i];
                     final isSelected = a.id == _filterAssetId;
                     return ListTile(
-                      leading: const Icon(Icons.account_balance_wallet_outlined),
+                      leading:
+                          const Icon(Icons.account_balance_wallet_outlined),
                       title: Text(a.name),
-                      trailing: isSelected ? const Icon(Icons.check, color: Colors.teal) : null,
+                      trailing: isSelected
+                          ? const Icon(Icons.check, color: Colors.teal)
+                          : null,
                       onTap: () {
                         setState(() {
                           _filterAssetId = a.id;
@@ -255,7 +262,9 @@ class _StatistikPageState extends State<StatistikPage> {
               ListTile(
                 leading: const Icon(Icons.all_inclusive),
                 title: const Text('Semua Tag'),
-                trailing: _filterTagId == null ? const Icon(Icons.check, color: Colors.teal) : null,
+                trailing: _filterTagId == null
+                    ? const Icon(Icons.check, color: Colors.teal)
+                    : null,
                 onTap: () {
                   setState(() {
                     _filterTagId = null;
@@ -267,7 +276,8 @@ class _StatistikPageState extends State<StatistikPage> {
               if (tags.isEmpty)
                 const Padding(
                   padding: EdgeInsets.all(24),
-                  child: Text('Belum ada tag yang dibuat', style: TextStyle(color: Colors.grey)),
+                  child: Text('Belum ada tag yang dibuat',
+                      style: TextStyle(color: Colors.grey)),
                 )
               else
                 Flexible(
@@ -280,7 +290,9 @@ class _StatistikPageState extends State<StatistikPage> {
                       return ListTile(
                         leading: const Icon(Icons.label_outline),
                         title: Text('#${t.name}'),
-                        trailing: isSelected ? const Icon(Icons.check, color: Colors.teal) : null,
+                        trailing: isSelected
+                            ? const Icon(Icons.check, color: Colors.teal)
+                            : null,
                         onTap: () {
                           setState(() {
                             _filterTagId = t.id;
@@ -382,6 +394,32 @@ class _StatistikPageState extends State<StatistikPage> {
     );
   }
 
+  Widget _subTabBar() {
+    return Padding(
+      padding: const EdgeInsets.only(left: 16, right: 16, top: 8, bottom: 4),
+      child: SegmentedButton<int>(
+        segments: const [
+          ButtonSegment(
+            value: 0,
+            icon: Icon(Icons.pie_chart_outline, size: 16),
+            label: Text('Kategori'),
+          ),
+          ButtonSegment(
+            value: 1,
+            icon: Icon(Icons.bar_chart_outlined, size: 16),
+            label: Text('Tren Bulanan'),
+          ),
+        ],
+        selected: {_subTab},
+        onSelectionChanged: (set) => setState(() => _subTab = set.first),
+        showSelectedIcon: false,
+        style: SegmentedButton.styleFrom(
+          visualDensity: VisualDensity.compact,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final period = _period;
@@ -391,199 +429,236 @@ class _StatistikPageState extends State<StatistikPage> {
 
     return Scaffold(
       body: SafeArea(
-        child: RepoFuture<_StatData>(
-          keyValue: (_selectedType, period, _filterAssetId, _filterTagId),
-          load: (repo) async {
-            final totals = await repo.totals(
-              period.from,
-              period.to,
-              assetId: _filterAssetId,
-              tagId: _filterTagId,
-            );
-            final stats = await repo.categoryStats(
-              _selectedType,
-              period.from,
-              period.to,
-              assetId: _filterAssetId,
-              tagId: _filterTagId,
-            );
-            return _StatData(totals, stats);
-          },
-          builder: (context, data) {
-            final totals = data.totals;
-            final stats = data.stats;
-            final totalAmount = stats.fold<int>(0, (sum, s) => sum + s.total);
-
-            return Column(
-              children: [
-                // 1. Baris Navigasi Atas: < Okt 2026 >    Bulanan v
-                Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      // Pemilih Tanggal / Periode
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          InkWell(
-                            borderRadius: BorderRadius.circular(16),
-                            onTap: () => _shift(-1),
-                            child: const Padding(
-                              padding: EdgeInsets.all(4),
-                              child: Icon(Icons.chevron_left, size: 24),
-                            ),
-                          ),
-                          const SizedBox(width: 6),
-                          GestureDetector(
-                            onTap: _mode == StatMode.range
-                                ? _pickRange
-                                : () => _pickMonth(context),
-                            child: Text(
-                              period.label,
-                              style: const TextStyle(
-                                fontSize: 17,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 6),
-                          InkWell(
-                            borderRadius: BorderRadius.circular(16),
-                            onTap: () => _shift(1),
-                            child: const Padding(
-                              padding: EdgeInsets.all(4),
-                              child: Icon(Icons.chevron_right, size: 24),
-                            ),
-                          ),
-                        ],
+        child: Column(
+          children: [
+            _subTabBar(),
+            Expanded(
+              child: _subTab == 1
+                  ? TrenBulananView(
+                      filterAssetId: _filterAssetId,
+                      filterTagId: _filterTagId,
+                      filterBar: _filterBar(context),
+                    )
+                  : RepoFuture<_StatData>(
+                      keyValue: (
+                        _selectedType,
+                        period,
+                        _filterAssetId,
+                        _filterTagId
                       ),
-                      // Dropdown Mode (Bulanan / Mingguan / Tahunan / Periode)
-                      PopupMenuButton<StatMode>(
-                        initialValue: _mode,
-                        onSelected: _selectMode,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        itemBuilder: (context) => [
-                          for (final m in StatMode.values)
-                            PopupMenuItem(
-                              value: m,
-                              child: Text(_modeLabels[m]!),
-                            ),
-                        ],
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 14, vertical: 6),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            border: Border.all(
-                              color: isDark ? Colors.white24 : Colors.black26,
-                            ),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                _modeLabels[_mode]!,
-                                style: const TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                              const SizedBox(width: 4),
-                              const Icon(Icons.keyboard_arrow_down, size: 18),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+                      load: (repo) async {
+                        final totals = await repo.totals(
+                          period.from,
+                          period.to,
+                          assetId: _filterAssetId,
+                          tagId: _filterTagId,
+                        );
+                        final stats = await repo.categoryStats(
+                          _selectedType,
+                          period.from,
+                          period.to,
+                          assetId: _filterAssetId,
+                          tagId: _filterTagId,
+                        );
+                        return _StatData(totals, stats);
+                      },
+                      builder: (context, data) {
+                        final totals = data.totals;
+                        final stats = data.stats;
+                        final totalAmount =
+                            stats.fold<int>(0, (sum, s) => sum + s.total);
 
-                // 2. Baris Filter Aset & Tag
-                _filterBar(context),
-
-                // 3. Tab Bar: Pendapatan Rp ...    Pengeluaran Rp ...
-                Row(
-                  children: [
-                    _tabButton(
-                      label: 'Pendapatan',
-                      amount: '${rupiah(totals.income)},00',
-                      isSelected: _selectedType == 'income',
-                      onTap: () => setState(() => _selectedType = 'income'),
-                    ),
-                    _tabButton(
-                      label: 'Pengeluaran',
-                      amount: '${rupiah(totals.expense)},00',
-                      isSelected: _selectedType == 'expense',
-                      onTap: () => setState(() => _selectedType = 'expense'),
-                    ),
-                  ],
-                ),
-                Divider(
-                  height: 1,
-                  thickness: 1,
-                  color: isDark ? Colors.white12 : Colors.black12,
-                ),
-
-                // 4. Konten: Diagram Pie Solid & List Kategori
-                Expanded(
-                  child: stats.isEmpty || totalAmount == 0
-                      ? Center(
-                          child: Text(
-                            (_filterAssetId != null || _filterTagId != null)
-                                ? 'Tidak ada transaksi untuk filter yang dipilih.'
-                                : (_selectedType == 'income'
-                                    ? 'Belum ada pendapatan pada periode ini.'
-                                    : 'Belum ada pengeluaran pada periode ini.'),
-                            style: TextStyle(
-                              color: textColor.withValues(alpha: 0.5),
-                              fontSize: 14,
-                            ),
-                          ),
-                        )
-                      : ListView(
-                          padding: const EdgeInsets.only(bottom: 24),
+                        return Column(
                           children: [
-                            const SizedBox(height: 16),
-                            // Diagram Lingkaran Solid dengan Callout Lines
-                            _PieChartWithCallouts(
-                              stats: stats,
-                              total: totalAmount,
-                              palette: _chartPalette,
-                              textColor: textColor,
-                              isDark: isDark,
+                            // 1. Baris Navigasi Atas: < Okt 2026 >    Bulanan v
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 16, vertical: 12),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  // Pemilih Tanggal / Periode
+                                  Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      InkWell(
+                                        borderRadius: BorderRadius.circular(16),
+                                        onTap: () => _shift(-1),
+                                        child: const Padding(
+                                          padding: EdgeInsets.all(4),
+                                          child: Icon(Icons.chevron_left,
+                                              size: 24),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 6),
+                                      GestureDetector(
+                                        onTap: _mode == StatMode.range
+                                            ? _pickRange
+                                            : () => _pickMonth(context),
+                                        child: Text(
+                                          period.label,
+                                          style: const TextStyle(
+                                            fontSize: 17,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 6),
+                                      InkWell(
+                                        borderRadius: BorderRadius.circular(16),
+                                        onTap: () => _shift(1),
+                                        child: const Padding(
+                                          padding: EdgeInsets.all(4),
+                                          child: Icon(Icons.chevron_right,
+                                              size: 24),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  // Dropdown Mode (Bulanan / Mingguan / Tahunan / Periode)
+                                  PopupMenuButton<StatMode>(
+                                    initialValue: _mode,
+                                    onSelected: _selectMode,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    itemBuilder: (context) => [
+                                      for (final m in StatMode.values)
+                                        PopupMenuItem(
+                                          value: m,
+                                          child: Text(_modeLabels[m]!),
+                                        ),
+                                    ],
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 14, vertical: 6),
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(10),
+                                        border: Border.all(
+                                          color: isDark
+                                              ? Colors.white24
+                                              : Colors.black26,
+                                        ),
+                                      ),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Text(
+                                            _modeLabels[_mode]!,
+                                            style: const TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                          const SizedBox(width: 4),
+                                          const Icon(Icons.keyboard_arrow_down,
+                                              size: 18),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
-                            const SizedBox(height: 12),
+
+                            // 2. Baris Filter Aset & Tag
+                            _filterBar(context),
+
+                            // 3. Tab Bar: Pendapatan Rp ...    Pengeluaran Rp ...
+                            Row(
+                              children: [
+                                _tabButton(
+                                  label: 'Pendapatan',
+                                  amount: '${rupiah(totals.income)},00',
+                                  isSelected: _selectedType == 'income',
+                                  onTap: () =>
+                                      setState(() => _selectedType = 'income'),
+                                ),
+                                _tabButton(
+                                  label: 'Pengeluaran',
+                                  amount: '${rupiah(totals.expense)},00',
+                                  isSelected: _selectedType == 'expense',
+                                  onTap: () =>
+                                      setState(() => _selectedType = 'expense'),
+                                ),
+                              ],
+                            ),
                             Divider(
                               height: 1,
-                              thickness: 0.5,
-                              color: isDark ? Colors.white10 : Colors.black12,
+                              thickness: 1,
+                              color: isDark ? Colors.white12 : Colors.black12,
                             ),
 
-                            // List Kategori di Bawah Diagram (tanpa icon)
-                            for (var i = 0; i < stats.length; i++) ...[
-                              _categoryListItem(
-                                stat: stats[i],
-                                color: _chartPalette[i % _chartPalette.length],
-                                totalPeriod: totalAmount,
-                                period: period,
-                                textColor: textColor,
-                              ),
-                              Divider(
-                                height: 1,
-                                thickness: 0.5,
-                                color: isDark ? Colors.white10 : Colors.black12,
-                              ),
-                            ],
+                            // 4. Konten: Diagram Pie Solid & List Kategori
+                            Expanded(
+                              child: stats.isEmpty || totalAmount == 0
+                                  ? Center(
+                                      child: Text(
+                                        (_filterAssetId != null ||
+                                                _filterTagId != null)
+                                            ? 'Tidak ada transaksi untuk filter yang dipilih.'
+                                            : (_selectedType == 'income'
+                                                ? 'Belum ada pendapatan pada periode ini.'
+                                                : 'Belum ada pengeluaran pada periode ini.'),
+                                        style: TextStyle(
+                                          color:
+                                              textColor.withValues(alpha: 0.5),
+                                          fontSize: 14,
+                                        ),
+                                      ),
+                                    )
+                                  : ListView(
+                                      padding:
+                                          const EdgeInsets.only(bottom: 24),
+                                      children: [
+                                        const SizedBox(height: 16),
+                                        // Diagram Lingkaran Solid dengan Callout Lines
+                                        _PieChartWithCallouts(
+                                          stats: stats,
+                                          total: totalAmount,
+                                          palette: _chartPalette,
+                                          textColor: textColor,
+                                          isDark: isDark,
+                                        ),
+                                        const SizedBox(height: 12),
+                                        Divider(
+                                          height: 1,
+                                          thickness: 0.5,
+                                          color: isDark
+                                              ? Colors.white10
+                                              : Colors.black12,
+                                        ),
+
+                                        // List Kategori di Bawah Diagram (tanpa icon)
+                                        for (var i = 0;
+                                            i < stats.length;
+                                            i++) ...[
+                                          _categoryListItem(
+                                            stat: stats[i],
+                                            color: _chartPalette[
+                                                i % _chartPalette.length],
+                                            totalPeriod: totalAmount,
+                                            period: period,
+                                            textColor: textColor,
+                                          ),
+                                          Divider(
+                                            height: 1,
+                                            thickness: 0.5,
+                                            color: isDark
+                                                ? Colors.white10
+                                                : Colors.black12,
+                                          ),
+                                        ],
+                                      ],
+                                    ),
+                            ),
                           ],
-                        ),
-                ),
-              ],
-            );
-          },
+                        );
+                      },
+                    ),
+            ),
+          ],
         ),
       ),
     );
