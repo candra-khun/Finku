@@ -260,6 +260,7 @@ class _TxFormPageState extends State<TxFormPage> {
                     ],
                     selected: {_type},
                     onSelectionChanged: (s) => _changeType(s.first),
+                    showSelectedIcon: false,
                   ),
                   const SizedBox(height: 16),
                   InkWell(

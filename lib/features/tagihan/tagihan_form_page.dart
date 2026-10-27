@@ -188,6 +188,7 @@ class _TagihanFormPageState extends State<TagihanFormPage> {
                 ButtonSegment(value: 'transfer', label: Text('Transfer')),
               ],
               selected: {_type},
+              showSelectedIcon: false,
               onSelectionChanged: (set) {
                 setState(() {
                   _type = set.first;
