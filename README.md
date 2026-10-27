@@ -215,10 +215,18 @@ flutter test
 flutter run
 ```
 
-### Membuat Berkas Rilis (APK)
+### Membuat Berkas Rilis (APK Teroptimasi & Terkompresi)
+
 ```bash
+# Rekomendasi: Build APK dengan kompresi per arsitektur (Ukuran ~17 - 19 MB)
+flutter build apk --release --split-per-abi --obfuscate --split-debug-info=build/app/outputs/symbols
+
+# Hasil APK per target:
+# - build/app/outputs/flutter-apk/app-arm64-v8a-release.apk (HP Android modern 64-bit ~19.5 MB)
+# - build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk (HP Android 32-bit ~17 MB)
+
+# Atau build universal fat APK (Semua arsitektur digabung ~57 MB):
 flutter build apk --release
-# Berkas APK hasil rilis: build/app/outputs/flutter-apk/app-release.apk
 ```
 
 ---
