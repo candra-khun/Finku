@@ -47,4 +47,21 @@ void main() {
     expect(bOver.isOverBudget, true);
     expect(bOver.progress, 1.25);
   });
+
+  test('perhitungan tanggal jatuh tempo transaksi berulang', () {
+    final start = DateTime(2026, 10, 15);
+    final nextMonth = computeNextDueDate(start, 'monthly', 1, 15);
+    expect(nextMonth, DateTime(2026, 11, 15));
+
+    final nextYear = computeNextDueDate(start, 'yearly', 1, 15);
+    expect(nextYear, DateTime(2027, 10, 15));
+
+    final nextWeek = computeNextDueDate(start, 'weekly', 1, 15);
+    expect(nextWeek, DateTime(2026, 10, 22));
+
+    // Handle akhir bulan (misal tgl 31 pada bulan 30 hari)
+    final jan31 = DateTime(2026, 1, 31);
+    final feb = computeNextDueDate(jan31, 'monthly', 1, 31);
+    expect(feb, DateTime(2026, 2, 28)); // 2026 bukan tahun kabisat
+  });
 }

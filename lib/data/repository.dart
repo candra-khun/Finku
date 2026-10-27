@@ -744,4 +744,196 @@ class Repo extends ChangeNotifier {
       items: items,
     );
   }
+
+  // ------------------------------------------------ recurring transactions
+  Future<List<RecurringTx>> recurringList({bool? activeOnly}) async {
+    final db = await _d.db;
+    final where = activeOnly == true ? 'WHERE r.is_active = 1' : '';
+    final rows = await db.rawQuery('''
+      SELECT r.*,
+             c.name AS category_name, c.color AS category_color,
+             a.name AS asset_name,
+             ta.name AS to_asset_name
+      FROM recurring_transactions r
+      LEFT JOIN categories c ON c.id = r.category_id
+      LEFT JOIN assets a ON a.id = r.asset_id
+      LEFT JOIN assets ta ON ta.id = r.to_asset_id
+      $where
+      ORDER BY r.next_due_date ASC, r.id DESC
+    ''');
+    return rows.map(RecurringTx.fromMap).toList();
+  }
+
+  Future<int> insertRecurring({
+    required String title,
+    required String type,
+    required int amount,
+    int? categoryId,
+    required int assetId,
+    int? toAssetId,
+    String frequency = 'monthly',
+    int interval = 1,
+    int dueDay = 1,
+    required DateTime startDate,
+    required DateTime nextDueDate,
+    bool autoRecord = false,
+    bool isActive = true,
+    String note = '',
+  }) async {
+    final db = await _d.db;
+    final id = await db.insert('recurring_transactions', {
+      'title': title,
+      'type': type,
+      'amount': amount,
+      'category_id': categoryId,
+      'asset_id': assetId,
+      'to_asset_id': toAssetId,
+      'frequency': frequency,
+      'interval': interval,
+      'due_day': dueDay,
+      'start_date': ymd(startDate),
+      'next_due_date': ymd(nextDueDate),
+      'auto_record': autoRecord ? 1 : 0,
+      'is_active': isActive ? 1 : 0,
+      'note': note,
+    });
+    _changed();
+    return id;
+  }
+
+  Future<void> updateRecurring({
+    required int id,
+    required String title,
+    required String type,
+    required int amount,
+    int? categoryId,
+    required int assetId,
+    int? toAssetId,
+    String frequency = 'monthly',
+    int interval = 1,
+    int dueDay = 1,
+    required DateTime startDate,
+    required DateTime nextDueDate,
+    bool autoRecord = false,
+    bool isActive = true,
+    String note = '',
+  }) async {
+    final db = await _d.db;
+    await db.update(
+      'recurring_transactions',
+      {
+        'title': title,
+        'type': type,
+        'amount': amount,
+        'category_id': categoryId,
+        'asset_id': assetId,
+        'to_asset_id': toAssetId,
+        'frequency': frequency,
+        'interval': interval,
+        'due_day': dueDay,
+        'start_date': ymd(startDate),
+        'next_due_date': ymd(nextDueDate),
+        'auto_record': autoRecord ? 1 : 0,
+        'is_active': isActive ? 1 : 0,
+        'note': note,
+      },
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+    _changed();
+  }
+
+  Future<void> deleteRecurring(int id) async {
+    final db = await _d.db;
+    await db.delete('recurring_transactions', where: 'id = ?', whereArgs: [id]);
+    _changed();
+  }
+
+  Future<void> toggleRecurringActive(int id, bool isActive) async {
+    final db = await _d.db;
+    await db.update(
+      'recurring_transactions',
+      {'is_active': isActive ? 1 : 0},
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+    _changed();
+  }
+
+  /// Catat transaksi berulang / bayar tagihan sekarang
+  Future<int> recordRecurringTx(RecurringTx item, {DateTime? recordDate}) async {
+    final actualDate = recordDate ?? DateTime.now();
+    final note = item.note.isNotEmpty
+        ? item.note
+        : 'Tagihan rutin: ${item.title}';
+
+    // 1. Masukkan ke transaksi
+    final txId = await addTransaction(TxInput(
+      type: item.type,
+      date: actualDate,
+      amount: item.amount,
+      categoryId: item.categoryId,
+      assetId: item.assetId,
+      toAssetId: item.toAssetId,
+      note: note,
+      description: item.title,
+      tagIds: const [],
+    ));
+
+    // 2. Hitung tanggal jatuh tempo berikutnya
+    final nextDue = computeNextDueDate(
+      item.nextDueDate,
+      item.frequency,
+      item.interval,
+      item.dueDay,
+    );
+
+    // 3. Perbarui recurring item
+    final db = await _d.db;
+    await db.update(
+      'recurring_transactions',
+      {
+        'last_processed_date': ymd(actualDate),
+        'next_due_date': ymd(nextDue),
+      },
+      where: 'id = ?',
+      whereArgs: [item.id],
+    );
+
+    _changed();
+    return txId;
+  }
+
+  /// Memproses transaksi rutin yang disetel otomatis dan sudah jatuh tempo
+  Future<int> processDueAutoRecurring() async {
+    final today = ymd(DateTime.now());
+    final db = await _d.db;
+    final rows = await db.rawQuery('''
+      SELECT r.*,
+             c.name AS category_name, c.color AS category_color,
+             a.name AS asset_name,
+             ta.name AS to_asset_name
+      FROM recurring_transactions r
+      LEFT JOIN categories c ON c.id = r.category_id
+      LEFT JOIN assets a ON a.id = r.asset_id
+      LEFT JOIN assets ta ON ta.id = r.to_asset_id
+      WHERE r.is_active = 1 AND r.auto_record = 1 AND r.next_due_date <= ?
+    ''', [today]);
+
+    if (rows.isEmpty) return 0;
+
+    int count = 0;
+    for (final r in rows) {
+      final item = RecurringTx.fromMap(r);
+      await recordRecurringTx(item, recordDate: item.nextDueDate);
+      count++;
+    }
+    return count;
+  }
+
+  /// Tagihan yang sudah atau segera jatuh tempo (dalam 3 hari)
+  Future<List<RecurringTx>> getDueOrUpcomingReminders() async {
+    final list = await recurringList(activeOnly: true);
+    return list.where((item) => item.isOverdue || item.isDueToday || item.daysUntilDue <= 3).toList();
+  }
 }

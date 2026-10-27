@@ -48,6 +48,27 @@ class AppDb {
         UNIQUE(category_id, period)
       )
     ''').catchError((_) {});
+    // Pastikan tabel recurring_transactions tersedia
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS recurring_transactions(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        title TEXT NOT NULL,
+        type TEXT NOT NULL,
+        amount INTEGER NOT NULL,
+        category_id INTEGER REFERENCES categories(id) ON DELETE SET NULL,
+        asset_id INTEGER NOT NULL REFERENCES assets(id),
+        to_asset_id INTEGER REFERENCES assets(id),
+        frequency TEXT NOT NULL DEFAULT 'monthly',
+        interval INTEGER NOT NULL DEFAULT 1,
+        due_day INTEGER NOT NULL DEFAULT 1,
+        start_date TEXT NOT NULL,
+        next_due_date TEXT NOT NULL,
+        last_processed_date TEXT,
+        auto_record INTEGER NOT NULL DEFAULT 0,
+        is_active INTEGER NOT NULL DEFAULT 1,
+        note TEXT NOT NULL DEFAULT ''
+      )
+    ''').catchError((_) {});
     return db;
   }
 
@@ -119,6 +140,25 @@ class AppDb {
         amount INTEGER NOT NULL,
         period TEXT NOT NULL,
         UNIQUE(category_id, period)
+      )''');
+    await d.execute('''
+      CREATE TABLE recurring_transactions(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        title TEXT NOT NULL,
+        type TEXT NOT NULL,
+        amount INTEGER NOT NULL,
+        category_id INTEGER REFERENCES categories(id) ON DELETE SET NULL,
+        asset_id INTEGER NOT NULL REFERENCES assets(id),
+        to_asset_id INTEGER REFERENCES assets(id),
+        frequency TEXT NOT NULL DEFAULT 'monthly',
+        interval INTEGER NOT NULL DEFAULT 1,
+        due_day INTEGER NOT NULL DEFAULT 1,
+        start_date TEXT NOT NULL,
+        next_due_date TEXT NOT NULL,
+        last_processed_date TEXT,
+        auto_record INTEGER NOT NULL DEFAULT 0,
+        is_active INTEGER NOT NULL DEFAULT 1,
+        note TEXT NOT NULL DEFAULT ''
       )''');
 
     // Data awal: tiga grup aset utama beserta satu aset di tiap grup.

@@ -113,6 +113,27 @@ class _HomeShellState extends State<HomeShell> {
   int _index = 0;
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      try {
+        final processed = await context.read<Repo>().processDueAutoRecurring();
+        if (processed > 0 && mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('$processed transaksi rutin otomatis telah dicatat'),
+              behavior: SnackBarBehavior.floating,
+              backgroundColor: Colors.teal,
+            ),
+          );
+        }
+      } catch (e) {
+        debugPrint('Auto recurring process error: $e');
+      }
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: IndexedStack(

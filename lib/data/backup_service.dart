@@ -49,6 +49,7 @@ class BackupService {
       'memos': await db.query('memos'),
       'closings': await db.query('closings'),
       'budgets': await db.query('budgets'),
+      'recurring_transactions': await db.query('recurring_transactions'),
     };
   }
 
@@ -137,6 +138,7 @@ class BackupService {
     final db = await _d.db;
     await db.transaction((txn) async {
       // 1. Bersihkan tabel lama dalam urutan dependensi foreign key
+      await txn.delete('recurring_transactions').catchError((_) => 0);
       await txn.delete('budgets').catchError((_) => 0);
       await txn.delete('transaction_tags');
       await txn.delete('transactions');
@@ -192,6 +194,11 @@ class BackupService {
       final budgets = (decoded['budgets'] as List?) ?? [];
       for (final r in budgets) {
         await txn.insert('budgets', Map<String, dynamic>.from(r as Map)).catchError((_) => 0);
+      }
+
+      final recurring = (decoded['recurring_transactions'] as List?) ?? [];
+      for (final r in recurring) {
+        await txn.insert('recurring_transactions', Map<String, dynamic>.from(r as Map)).catchError((_) => 0);
       }
     });
 

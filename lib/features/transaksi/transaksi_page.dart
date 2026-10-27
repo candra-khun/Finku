@@ -6,6 +6,7 @@ import '../../core/widgets.dart';
 import '../../data/models.dart';
 import '../../data/repository.dart';
 import '../anggaran/anggaran_page.dart';
+import '../tagihan/tagihan_page.dart';
 import 'calendar_tab.dart';
 import 'closing_tab.dart';
 import 'memo_tab.dart';
@@ -51,6 +52,52 @@ class _TransaksiPageState extends State<TransaksiPage>
         onNext: () => _shiftMonth(1),
       );
 
+  Widget _dueBillBanner(BuildContext context) {
+    final repo = context.watch<Repo>();
+    return FutureBuilder<List<RecurringTx>>(
+      future: repo.getDueOrUpcomingReminders(),
+      builder: (context, snap) {
+        final dues = snap.data?.where((i) => i.isOverdue || i.isDueToday).toList() ?? [];
+        if (dues.isEmpty) return const SizedBox.shrink();
+
+        final first = dues.first;
+        final text = dues.length == 1
+            ? 'Pengingat: Tagihan "${first.title}" ${first.isDueToday ? "jatuh tempo hari ini!" : "lewat jatuh tempo!"}'
+            : 'Pengingat: ${dues.length} tagihan jatuh tempo / terlewat!';
+
+        return Material(
+          color: Colors.amber.shade900.withValues(alpha: 0.12),
+          child: InkWell(
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const TagihanPage()),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Row(
+                children: [
+                  const Icon(Icons.notifications_active, color: Colors.orangeAccent, size: 18),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      text,
+                      style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.orangeAccent),
+                    ),
+                  ),
+                  const Text(
+                    'Lihat',
+                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.orangeAccent),
+                  ),
+                  const Icon(Icons.chevron_right, size: 16, color: Colors.orangeAccent),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   Widget? _fab() {
     switch (_tab.index) {
       case 0:
@@ -78,6 +125,26 @@ class _TransaksiPageState extends State<TransaksiPage>
       appBar: AppBar(
         title: const Text('Transaksi'),
         actions: [
+          FutureBuilder<List<RecurringTx>>(
+            future: context.watch<Repo>().getDueOrUpcomingReminders(),
+            builder: (context, snap) {
+              final dueCount = snap.data?.where((i) => i.isOverdue || i.isDueToday).length ?? 0;
+              return IconButton(
+                tooltip: 'Transaksi Berulang & Tagihan',
+                icon: Badge(
+                  isLabelVisible: dueCount > 0,
+                  label: Text('$dueCount'),
+                  child: const Icon(Icons.event_repeat_outlined),
+                ),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const TagihanPage()),
+                  );
+                },
+              );
+            },
+          ),
           IconButton(
             tooltip: 'Anggaran',
             icon: const Icon(Icons.track_changes_outlined),
@@ -113,6 +180,7 @@ class _TransaksiPageState extends State<TransaksiPage>
         physics: const NeverScrollableScrollPhysics(),
         children: [
           Column(children: [
+            _dueBillBanner(context),
             _monthNav(),
             Expanded(child: HarianTab(month: _month)),
           ]),

@@ -10,6 +10,7 @@ import '../anggaran/anggaran_page.dart';
 import '../kategori/kelola_kategori_page.dart';
 import '../keamanan/kelola_keamanan_page.dart';
 import '../tag/kelola_tag_page.dart';
+import '../tagihan/tagihan_page.dart';
 
 enum CsvPeriodMode { all, thisMonth, thisYear, custom }
 
@@ -476,7 +477,7 @@ class _LainnyaPageState extends State<LainnyaPage> {
 
               const SizedBox(height: 24),
 
-              // ------------------------------------------ CARD 3: ANGGARAN
+              // ------------------------------------------ CARD 3: ANGGARAN & TAGIHAN
               _sectionTitle('Perencanaan Keuangan', Icons.savings_outlined),
               Card(
                 elevation: 0,
@@ -485,18 +486,36 @@ class _LainnyaPageState extends State<LainnyaPage> {
                   borderRadius: BorderRadius.circular(16),
                   side: BorderSide(color: isDark ? Colors.white12 : Colors.black12),
                 ),
-                child: ListTile(
-                  leading: CircleAvatar(
-                    backgroundColor: Colors.teal.withValues(alpha: 0.15),
-                    child: const Icon(Icons.track_changes, color: Colors.teal),
-                  ),
-                  title: const Text('Anggaran Pengeluaran', style: TextStyle(fontWeight: FontWeight.w600)),
-                  subtitle: const Text('Batas pengeluaran per kategori & pantau sisa anggaran bulanan'),
-                  trailing: const Icon(Icons.chevron_right),
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const AnggaranPage()),
-                  ),
+                child: Column(
+                  children: [
+                    ListTile(
+                      leading: CircleAvatar(
+                        backgroundColor: Colors.teal.withValues(alpha: 0.15),
+                        child: const Icon(Icons.track_changes, color: Colors.teal),
+                      ),
+                      title: const Text('Anggaran Pengeluaran', style: TextStyle(fontWeight: FontWeight.w600)),
+                      subtitle: const Text('Batas pengeluaran per kategori & pantau sisa anggaran bulanan'),
+                      trailing: const Icon(Icons.chevron_right),
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const AnggaranPage()),
+                      ),
+                    ),
+                    Divider(height: 1, indent: 64, color: isDark ? Colors.white12 : Colors.black12),
+                    ListTile(
+                      leading: CircleAvatar(
+                        backgroundColor: Colors.orangeAccent.withValues(alpha: 0.15),
+                        child: const Icon(Icons.event_repeat_outlined, color: Colors.orangeAccent),
+                      ),
+                      title: const Text('Transaksi Berulang & Tagihan', style: TextStyle(fontWeight: FontWeight.w600)),
+                      subtitle: const Text('Langganan rutin, cicilan, dan pengingat jatuh tempo'),
+                      trailing: const Icon(Icons.chevron_right),
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const TagihanPage()),
+                      ),
+                    ),
+                  ],
                 ),
               ),
 
