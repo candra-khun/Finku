@@ -89,7 +89,9 @@ class _LainnyaPageState extends State<LainnyaPage> {
   Future<void> _pasteAndRestore(BackupService service) async {
     final textCtrl = TextEditingController();
     final data = await Clipboard.getData(Clipboard.kTextPlain);
-    if (data?.text != null && (data!.text!.contains('finku') || data.text!.contains('keuangan_saku'))) {
+    if (data?.text != null &&
+        (data!.text!.contains('finku') ||
+            data.text!.contains('keuangan_saku'))) {
       textCtrl.text = data.text!;
     }
 
@@ -161,7 +163,8 @@ class _LainnyaPageState extends State<LainnyaPage> {
               ),
               const SizedBox(height: 8),
               _summaryRow('Waktu Cadangan', tglPanjang(summary.createdAt)),
-              _summaryRow('Total Transaksi', '${summary.transactionCount} transaksi'),
+              _summaryRow(
+                  'Total Transaksi', '${summary.transactionCount} transaksi'),
               _summaryRow('Jumlah Aset/Akun', '${summary.assetCount} aset'),
               _summaryRow('Kategori', '${summary.categoryCount} kategori'),
               _summaryRow('Tag / Label', '${summary.tagCount} tag'),
@@ -171,7 +174,8 @@ class _LainnyaPageState extends State<LainnyaPage> {
                 decoration: BoxDecoration(
                   color: Colors.red.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.redAccent.withValues(alpha: 0.4)),
+                  border: Border.all(
+                      color: Colors.redAccent.withValues(alpha: 0.4)),
                 ),
                 child: const Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -222,7 +226,9 @@ class _LainnyaPageState extends State<LainnyaPage> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(label, style: const TextStyle(fontSize: 13, color: Colors.grey)),
-          Text(value, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
+          Text(value,
+              style:
+                  const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
         ],
       ),
     );
@@ -315,7 +321,8 @@ class _LainnyaPageState extends State<LainnyaPage> {
                 color: isDark ? const Color(0xFF23272F) : Colors.grey.shade100,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
-                  side: BorderSide(color: isDark ? Colors.white12 : Colors.black12),
+                  side: BorderSide(
+                      color: isDark ? Colors.white12 : Colors.black12),
                 ),
                 child: Padding(
                   padding: const EdgeInsets.all(16),
@@ -329,7 +336,8 @@ class _LainnyaPageState extends State<LainnyaPage> {
                       const SizedBox(height: 16),
                       // Tombol Cadangkan
                       FilledButton.icon(
-                        onPressed: _isLoading ? null : () => _backupAndShare(service),
+                        onPressed:
+                            _isLoading ? null : () => _backupAndShare(service),
                         icon: const Icon(Icons.upload_file),
                         label: const Text('Cadangkan Data ke File'),
                         style: FilledButton.styleFrom(
@@ -339,7 +347,8 @@ class _LainnyaPageState extends State<LainnyaPage> {
                       const SizedBox(height: 8),
                       // Opsi Salin JSON
                       OutlinedButton.icon(
-                        onPressed: _isLoading ? null : () => _copyBackupJson(service),
+                        onPressed:
+                            _isLoading ? null : () => _copyBackupJson(service),
                         icon: const Icon(Icons.copy, size: 18),
                         label: const Text('Salin Teks Cadangan (JSON)'),
                         style: OutlinedButton.styleFrom(
@@ -350,14 +359,17 @@ class _LainnyaPageState extends State<LainnyaPage> {
                       // Pemulihan Data
                       const Text(
                         'Pulihkan Data dari Cadangan:',
-                        style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+                        style: TextStyle(
+                            fontSize: 13, fontWeight: FontWeight.w600),
                       ),
                       const SizedBox(height: 10),
                       Row(
                         children: [
                           Expanded(
                             child: OutlinedButton.icon(
-                              onPressed: _isLoading ? null : () => _pickAndRestore(service),
+                              onPressed: _isLoading
+                                  ? null
+                                  : () => _pickAndRestore(service),
                               icon: const Icon(Icons.folder_open, size: 18),
                               label: const Text('Pilih Berkas'),
                             ),
@@ -365,7 +377,9 @@ class _LainnyaPageState extends State<LainnyaPage> {
                           const SizedBox(width: 8),
                           Expanded(
                             child: OutlinedButton.icon(
-                              onPressed: _isLoading ? null : () => _pasteAndRestore(service),
+                              onPressed: _isLoading
+                                  ? null
+                                  : () => _pasteAndRestore(service),
                               icon: const Icon(Icons.paste, size: 18),
                               label: const Text('Tempel Teks'),
                             ),
@@ -380,13 +394,15 @@ class _LainnyaPageState extends State<LainnyaPage> {
               const SizedBox(height: 24),
 
               // ------------------------------------------ CARD 2: EXPORT EXCEL & CSV
-              _sectionTitle('Ekspor ke Excel & CSV', Icons.table_chart_outlined),
+              _sectionTitle(
+                  'Ekspor ke Excel & CSV', Icons.table_chart_outlined),
               Card(
                 elevation: 0,
                 color: isDark ? const Color(0xFF23272F) : Colors.grey.shade100,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
-                  side: BorderSide(color: isDark ? Colors.white12 : Colors.black12),
+                  side: BorderSide(
+                      color: isDark ? Colors.white12 : Colors.black12),
                 ),
                 child: Padding(
                   padding: const EdgeInsets.all(16),
@@ -402,7 +418,10 @@ class _LainnyaPageState extends State<LainnyaPage> {
                       // Filter Periode
                       const Text(
                         'Periode Transaksi:',
-                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.grey),
+                        style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.grey),
                       ),
                       const SizedBox(height: 6),
                       Wrap(
@@ -411,17 +430,20 @@ class _LainnyaPageState extends State<LainnyaPage> {
                           ChoiceChip(
                             label: const Text('Semua'),
                             selected: _csvMode == CsvPeriodMode.all,
-                            onSelected: (_) => setState(() => _csvMode = CsvPeriodMode.all),
+                            onSelected: (_) =>
+                                setState(() => _csvMode = CsvPeriodMode.all),
                           ),
                           ChoiceChip(
                             label: const Text('Bulan Ini'),
                             selected: _csvMode == CsvPeriodMode.thisMonth,
-                            onSelected: (_) => setState(() => _csvMode = CsvPeriodMode.thisMonth),
+                            onSelected: (_) => setState(
+                                () => _csvMode = CsvPeriodMode.thisMonth),
                           ),
                           ChoiceChip(
                             label: const Text('Tahun Ini'),
                             selected: _csvMode == CsvPeriodMode.thisYear,
-                            onSelected: (_) => setState(() => _csvMode = CsvPeriodMode.thisYear),
+                            onSelected: (_) => setState(
+                                () => _csvMode = CsvPeriodMode.thisYear),
                           ),
                           ChoiceChip(
                             label: Text(
@@ -440,21 +462,26 @@ class _LainnyaPageState extends State<LainnyaPage> {
                       // Pemisah Kolom (Separator)
                       const Text(
                         'Pemisah Kolom (Delimiter):',
-                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.grey),
+                        style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.grey),
                       ),
                       const SizedBox(height: 6),
                       Row(
                         children: [
                           ChoiceChip(
-                            label: const Text('Titik Koma (;) - Excel ID'),
+                            label: const Text('Excel ID'),
                             selected: _csvSeparator == ';',
-                            onSelected: (_) => setState(() => _csvSeparator = ';'),
+                            onSelected: (_) =>
+                                setState(() => _csvSeparator = ';'),
                           ),
                           const SizedBox(width: 8),
                           ChoiceChip(
-                            label: const Text('Koma (,) - Internasional'),
+                            label: const Text('Internasional'),
                             selected: _csvSeparator == ',',
-                            onSelected: (_) => setState(() => _csvSeparator = ','),
+                            onSelected: (_) =>
+                                setState(() => _csvSeparator = ','),
                           ),
                         ],
                       ),
@@ -463,7 +490,8 @@ class _LainnyaPageState extends State<LainnyaPage> {
 
                       // Tombol Ekspor
                       FilledButton.icon(
-                        onPressed: _isLoading ? null : () => _exportCsv(service),
+                        onPressed:
+                            _isLoading ? null : () => _exportCsv(service),
                         icon: const Icon(Icons.share),
                         label: const Text('Ekspor & Bagikan Berkas CSV'),
                         style: FilledButton.styleFrom(
@@ -484,31 +512,42 @@ class _LainnyaPageState extends State<LainnyaPage> {
                 color: isDark ? const Color(0xFF23272F) : Colors.grey.shade100,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
-                  side: BorderSide(color: isDark ? Colors.white12 : Colors.black12),
+                  side: BorderSide(
+                      color: isDark ? Colors.white12 : Colors.black12),
                 ),
                 child: Column(
                   children: [
                     ListTile(
                       leading: CircleAvatar(
                         backgroundColor: Colors.teal.withValues(alpha: 0.15),
-                        child: const Icon(Icons.track_changes, color: Colors.teal),
+                        child:
+                            const Icon(Icons.track_changes, color: Colors.teal),
                       ),
-                      title: const Text('Anggaran Pengeluaran', style: TextStyle(fontWeight: FontWeight.w600)),
-                      subtitle: const Text('Batas pengeluaran per kategori & pantau sisa anggaran bulanan'),
+                      title: const Text('Anggaran Pengeluaran',
+                          style: TextStyle(fontWeight: FontWeight.w600)),
+                      subtitle: const Text(
+                          'Batas pengeluaran per kategori & pantau sisa anggaran bulanan'),
                       trailing: const Icon(Icons.chevron_right),
                       onTap: () => Navigator.push(
                         context,
                         MaterialPageRoute(builder: (_) => const AnggaranPage()),
                       ),
                     ),
-                    Divider(height: 1, indent: 64, color: isDark ? Colors.white12 : Colors.black12),
+                    Divider(
+                        height: 1,
+                        indent: 64,
+                        color: isDark ? Colors.white12 : Colors.black12),
                     ListTile(
                       leading: CircleAvatar(
-                        backgroundColor: Colors.orangeAccent.withValues(alpha: 0.15),
-                        child: const Icon(Icons.event_repeat_outlined, color: Colors.orangeAccent),
+                        backgroundColor:
+                            Colors.orangeAccent.withValues(alpha: 0.15),
+                        child: const Icon(Icons.event_repeat_outlined,
+                            color: Colors.orangeAccent),
                       ),
-                      title: const Text('Transaksi Berulang & Tagihan', style: TextStyle(fontWeight: FontWeight.w600)),
-                      subtitle: const Text('Langganan rutin, cicilan, dan pengingat jatuh tempo'),
+                      title: const Text('Transaksi Berulang & Tagihan',
+                          style: TextStyle(fontWeight: FontWeight.w600)),
+                      subtitle: const Text(
+                          'Langganan rutin, cicilan, dan pengingat jatuh tempo'),
                       trailing: const Icon(Icons.chevron_right),
                       onTap: () => Navigator.push(
                         context,
@@ -528,35 +567,49 @@ class _LainnyaPageState extends State<LainnyaPage> {
                 color: isDark ? const Color(0xFF23272F) : Colors.grey.shade100,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
-                  side: BorderSide(color: isDark ? Colors.white12 : Colors.black12),
+                  side: BorderSide(
+                      color: isDark ? Colors.white12 : Colors.black12),
                 ),
                 child: Column(
                   children: [
                     ListTile(
                       leading: CircleAvatar(
-                        backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.15),
-                        child: Icon(Icons.category_outlined, color: theme.colorScheme.primary),
+                        backgroundColor:
+                            theme.colorScheme.primary.withValues(alpha: 0.15),
+                        child: Icon(Icons.category_outlined,
+                            color: theme.colorScheme.primary),
                       ),
-                      title: const Text('Kelola Kategori', style: TextStyle(fontWeight: FontWeight.w600)),
-                      subtitle: const Text('Ubah nama, warna, hapus, dan urutkan kategori'),
+                      title: const Text('Kelola Kategori',
+                          style: TextStyle(fontWeight: FontWeight.w600)),
+                      subtitle: const Text(
+                          'Ubah nama, warna, hapus, dan urutkan kategori'),
                       trailing: const Icon(Icons.chevron_right),
                       onTap: () => Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (_) => const KelolaKategoriPage()),
+                        MaterialPageRoute(
+                            builder: (_) => const KelolaKategoriPage()),
                       ),
                     ),
-                    Divider(height: 1, indent: 64, color: isDark ? Colors.white12 : Colors.black12),
+                    Divider(
+                        height: 1,
+                        indent: 64,
+                        color: isDark ? Colors.white12 : Colors.black12),
                     ListTile(
                       leading: CircleAvatar(
-                        backgroundColor: theme.colorScheme.secondary.withValues(alpha: 0.15),
-                        child: Icon(Icons.label_outlined, color: theme.colorScheme.secondary),
+                        backgroundColor:
+                            theme.colorScheme.secondary.withValues(alpha: 0.15),
+                        child: Icon(Icons.label_outlined,
+                            color: theme.colorScheme.secondary),
                       ),
-                      title: const Text('Kelola Tag', style: TextStyle(fontWeight: FontWeight.w600)),
-                      subtitle: const Text('Ubah nama (koreksi salah ketik) atau hapus tag'),
+                      title: const Text('Kelola Tag',
+                          style: TextStyle(fontWeight: FontWeight.w600)),
+                      subtitle: const Text(
+                          'Ubah nama (koreksi salah ketik) atau hapus tag'),
                       trailing: const Icon(Icons.chevron_right),
                       onTap: () => Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (_) => const KelolaTagPage()),
+                        MaterialPageRoute(
+                            builder: (_) => const KelolaTagPage()),
                       ),
                     ),
                   ],
@@ -572,7 +625,8 @@ class _LainnyaPageState extends State<LainnyaPage> {
                 color: isDark ? const Color(0xFF23272F) : Colors.grey.shade100,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
-                  side: BorderSide(color: isDark ? Colors.white12 : Colors.black12),
+                  side: BorderSide(
+                      color: isDark ? Colors.white12 : Colors.black12),
                 ),
                 child: Column(
                   children: [
@@ -582,14 +636,20 @@ class _LainnyaPageState extends State<LainnyaPage> {
                             ? Colors.teal.withValues(alpha: 0.15)
                             : (isDark ? Colors.white12 : Colors.black12),
                         child: Icon(
-                          SecurityService.instance.isLockEnabled ? Icons.lock : Icons.lock_open,
-                          color: SecurityService.instance.isLockEnabled ? Colors.teal : Colors.grey,
+                          SecurityService.instance.isLockEnabled
+                              ? Icons.lock
+                              : Icons.lock_open,
+                          color: SecurityService.instance.isLockEnabled
+                              ? Colors.teal
+                              : Colors.grey,
                         ),
                       ),
-                      title: const Text('Kunci Aplikasi (PIN & Sidik Jari)', style: TextStyle(fontWeight: FontWeight.w600)),
+                      title: const Text('Kunci Aplikasi (PIN & Sidik Jari)',
+                          style: TextStyle(fontWeight: FontWeight.w600)),
                       subtitle: Text(
                         SecurityService.instance.isLockEnabled
-                            ? (SecurityService.instance.isBiometricEnabled && SecurityService.instance.hasBiometrics
+                            ? (SecurityService.instance.isBiometricEnabled &&
+                                    SecurityService.instance.hasBiometrics
                                 ? 'Aktif (PIN & Sidik Jari)'
                                 : 'Aktif (PIN)')
                             : 'Nonaktif - Pasang kunci pengaman',
@@ -598,12 +658,16 @@ class _LainnyaPageState extends State<LainnyaPage> {
                       onTap: () async {
                         await Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (_) => const KelolaKeamananPage()),
+                          MaterialPageRoute(
+                              builder: (_) => const KelolaKeamananPage()),
                         );
                         setState(() {});
                       },
                     ),
-                    Divider(height: 1, indent: 64, color: isDark ? Colors.white12 : Colors.black12),
+                    Divider(
+                        height: 1,
+                        indent: 64,
+                        color: isDark ? Colors.white12 : Colors.black12),
                     const Padding(
                       padding: EdgeInsets.all(16),
                       child: Column(
@@ -611,18 +675,21 @@ class _LainnyaPageState extends State<LainnyaPage> {
                         children: [
                           Row(
                             children: [
-                              Icon(Icons.shield_outlined, color: Colors.teal, size: 20),
+                              Icon(Icons.shield_outlined,
+                                  color: Colors.teal, size: 20),
                               SizedBox(width: 8),
                               Text(
                                 '100% Data Offline & Privat',
-                                style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+                                style: TextStyle(
+                                    fontWeight: FontWeight.w600, fontSize: 14),
                               ),
                             ],
                           ),
                           SizedBox(height: 8),
                           Text(
                             'Data keuangan Anda disimpan secara eksklusif di dalam database lokal ponsel Anda dan tidak pernah dikirim ke server luar. Karena itu, pastikan untuk menyimpan berkas cadangan di tempat aman (seperti Google Drive pribadi Anda).',
-                            style: TextStyle(fontSize: 12, height: 1.4, color: Colors.grey),
+                            style: TextStyle(
+                                fontSize: 12, height: 1.4, color: Colors.grey),
                           ),
                         ],
                       ),
@@ -651,17 +718,20 @@ class _LainnyaPageState extends State<LainnyaPage> {
                         ],
                       ),
                       clipBehavior: Clip.antiAlias,
-                      child: Image.asset('assets/images/logo.png', fit: BoxFit.contain),
+                      child: Image.asset('assets/images/logo.png',
+                          fit: BoxFit.contain),
                     ),
                     const SizedBox(height: 10),
                     const Text(
                       'Finku',
-                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                     ),
                     const SizedBox(height: 2),
                     Text(
                       'Financial-ku • Manajer Keuangan v1.0.0',
-                      style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+                      style:
+                          TextStyle(fontSize: 12, color: Colors.grey.shade600),
                     ),
                   ],
                 ),
@@ -677,7 +747,8 @@ class _LainnyaPageState extends State<LainnyaPage> {
               color: Colors.black54,
               child: Center(
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
                   decoration: BoxDecoration(
                     color: isDark ? const Color(0xFF2C3038) : Colors.white,
                     borderRadius: BorderRadius.circular(16),
@@ -720,4 +791,3 @@ class _LainnyaPageState extends State<LainnyaPage> {
     );
   }
 }
-
