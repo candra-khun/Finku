@@ -1006,4 +1006,394 @@ class Repo extends ChangeNotifier {
     final list = await recurringList(activeOnly: true);
     return list.where((item) => item.isOverdue || item.isDueToday || item.daysUntilDue <= 3).toList();
   }
+
+  // =========================================================================
+  // MODUL TARGET MENABUNG (SAVINGS GOALS)
+  // =========================================================================
+
+  /// Mengambil daftar seluruh target menabung
+  Future<List<SavingsGoal>> savingsGoals({String? status}) async {
+    final db = await _d.db;
+    final where = status == null ? null : 'g.status = ?';
+    final whereArgs = status == null ? null : [status];
+    final rows = await db.rawQuery('''
+      SELECT g.*, a.name AS asset_name
+      FROM savings_goals g
+      LEFT JOIN assets a ON a.id = g.asset_id
+      ${where != null ? 'WHERE $where' : ''}
+      ORDER BY 
+        CASE WHEN g.status = 'active' THEN 0 ELSE 1 END,
+        CASE WHEN g.target_date IS NULL THEN 1 ELSE 0 END,
+        g.target_date ASC,
+        g.id DESC
+    ''', whereArgs);
+    return rows.map(SavingsGoal.fromMap).toList();
+  }
+
+  /// Ringkasan total target menabung
+  Future<({int totalTarget, int totalSaved, int activeCount, int completedCount})> savingsGoalsSummary() async {
+    final goals = await savingsGoals();
+    var totalTarget = 0;
+    var totalSaved = 0;
+    var activeCount = 0;
+    var completedCount = 0;
+
+    for (final g in goals) {
+      if (g.status == 'active') {
+        activeCount++;
+        totalTarget += g.targetAmount;
+        totalSaved += g.currentAmount;
+      } else if (g.status == 'completed') {
+        completedCount++;
+        totalTarget += g.targetAmount;
+        totalSaved += g.currentAmount;
+      }
+    }
+    return (
+      totalTarget: totalTarget,
+      totalSaved: totalSaved,
+      activeCount: activeCount,
+      completedCount: completedCount,
+    );
+  }
+
+  /// Mengambil data target berdasarkan ID
+  Future<SavingsGoal?> getSavingsGoal(int id) async {
+    final db = await _d.db;
+    final rows = await db.rawQuery('''
+      SELECT g.*, a.name AS asset_name
+      FROM savings_goals g
+      LEFT JOIN assets a ON a.id = g.asset_id
+      WHERE g.id = ?
+    ''', [id]);
+    if (rows.isEmpty) return null;
+    return SavingsGoal.fromMap(rows.first);
+  }
+
+  /// Membuat target baru
+  Future<int> addSavingsGoal({
+    required String title,
+    required int targetAmount,
+    int initialAmount = 0,
+    DateTime? targetDate,
+    int color = 0xFF00897B,
+    String icon = 'flag',
+    int? assetId,
+    String note = '',
+    bool createInitialTransaction = false,
+  }) async {
+    final db = await _d.db;
+    final now = DateTime.now();
+    final goalId = await db.insert('savings_goals', {
+      'title': title.trim(),
+      'target_amount': targetAmount,
+      'current_amount': initialAmount,
+      'target_date': targetDate != null ? ymd(targetDate) : null,
+      'color': color,
+      'icon': icon,
+      'status': (initialAmount >= targetAmount && targetAmount > 0) ? 'completed' : 'active',
+      'asset_id': assetId,
+      'note': note.trim(),
+      'created_at': now.toIso8601String(),
+    });
+
+    if (initialAmount > 0) {
+      int? txId;
+      if (createInitialTransaction && assetId != null) {
+        txId = await _recordSavingsTransaction(
+          assetId: assetId,
+          amount: initialAmount,
+          isDeposit: true,
+          goalTitle: title.trim(),
+          date: now,
+          note: 'Setoran Awal Target',
+        );
+      }
+      await db.insert('goal_allocations', {
+        'goal_id': goalId,
+        'asset_id': assetId,
+        'amount': initialAmount,
+        'date': ymd(now),
+        'note': 'Setoran Awal Target',
+        'tx_id': txId,
+      });
+    }
+
+    _changed();
+    return goalId;
+  }
+
+  /// Memperbarui informasi target
+  Future<void> updateSavingsGoal(
+    int id, {
+    required String title,
+    required int targetAmount,
+    DateTime? targetDate,
+    int? color,
+    String? icon,
+    int? assetId,
+    String? note,
+    String? status,
+  }) async {
+    final db = await _d.db;
+    final current = await getSavingsGoal(id);
+    if (current == null) return;
+
+    final newStatus = status ??
+        ((current.currentAmount >= targetAmount && targetAmount > 0)
+            ? 'completed'
+            : current.status);
+
+    await db.update(
+      'savings_goals',
+      {
+        'title': title.trim(),
+        'target_amount': targetAmount,
+        'target_date': targetDate != null ? ymd(targetDate) : null,
+        if (color != null) 'color': color,
+        if (icon != null) 'icon': icon,
+        'asset_id': assetId,
+        if (note != null) 'note': note.trim(),
+        'status': newStatus,
+      },
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+    _changed();
+  }
+
+  /// Menghapus target
+  Future<void> deleteSavingsGoal(int id) async {
+    final db = await _d.db;
+    await db.delete('savings_goals', where: 'id = ?', whereArgs: [id]);
+    _changed();
+  }
+
+  /// Mengubah status target (active, completed, cancelled)
+  Future<void> updateGoalStatus(int id, String status) async {
+    final db = await _d.db;
+    await db.update('savings_goals', {'status': status}, where: 'id = ?', whereArgs: [id]);
+    _changed();
+  }
+
+  /// Memperpanjang batas waktu target (deadline)
+  Future<void> extendGoalDeadline(int id, DateTime newDeadline) async {
+    final db = await _d.db;
+    await db.update(
+      'savings_goals',
+      {
+        'target_date': ymd(newDeadline),
+        'status': 'active',
+      },
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+    _changed();
+  }
+
+  /// Mencatat transaksi mutasi tabungan di buku kas
+  Future<int?> _recordSavingsTransaction({
+    required int assetId,
+    required int amount,
+    required bool isDeposit,
+    required String goalTitle,
+    DateTime? date,
+    String note = '',
+  }) async {
+    final txDate = date ?? DateTime.now();
+    const catName = 'Tabungan / Investasi';
+    final catType = isDeposit ? 'expense' : 'income';
+    final catId = await addCategory(catName, catType);
+    final txNote = isDeposit
+        ? 'Menabung ke "$goalTitle"${note.isNotEmpty ? ": $note" : ""}'
+        : 'Tarik dari "$goalTitle"${note.isNotEmpty ? ": $note" : ""}';
+    return await addTransaction(TxInput(
+      type: catType,
+      date: txDate,
+      amount: amount,
+      categoryId: catId,
+      assetId: assetId,
+      toAssetId: null,
+      note: txNote,
+      description: 'Mutasi Tabungan Target Finku',
+      tagIds: const [],
+    ));
+  }
+
+  /// Menabung / Alokasi dana ke target
+  Future<void> allocateToGoal({
+    required int goalId,
+    required int amount,
+    int? assetId,
+    String note = '',
+    bool createTransaction = false,
+    DateTime? date,
+  }) async {
+    if (amount <= 0) return;
+    final db = await _d.db;
+    final goal = await getSavingsGoal(goalId);
+    if (goal == null) return;
+
+    final txDate = date ?? DateTime.now();
+    int? txId;
+    if (createTransaction && assetId != null) {
+      txId = await _recordSavingsTransaction(
+        assetId: assetId,
+        amount: amount,
+        isDeposit: true,
+        goalTitle: goal.title,
+        date: txDate,
+        note: note,
+      );
+    }
+
+    await db.insert('goal_allocations', {
+      'goal_id': goalId,
+      'asset_id': assetId,
+      'amount': amount,
+      'date': ymd(txDate),
+      'note': note.trim().isEmpty ? 'Menabung' : note.trim(),
+      'tx_id': txId,
+    });
+
+    final newAmount = goal.currentAmount + amount;
+    final isDone = newAmount >= goal.targetAmount && goal.targetAmount > 0;
+    await db.update(
+      'savings_goals',
+      {
+        'current_amount': newAmount,
+        if (isDone) 'status': 'completed',
+      },
+      where: 'id = ?',
+      whereArgs: [goalId],
+    );
+
+    _changed();
+  }
+
+  /// Menarik dana dari target
+  Future<void> withdrawFromGoal({
+    required int goalId,
+    required int amount,
+    int? assetId,
+    String note = '',
+    bool createTransaction = false,
+    DateTime? date,
+  }) async {
+    if (amount <= 0) return;
+    final db = await _d.db;
+    final goal = await getSavingsGoal(goalId);
+    if (goal == null) return;
+
+    final actualAmount = amount.clamp(0, goal.currentAmount);
+    if (actualAmount <= 0) return;
+
+    final txDate = date ?? DateTime.now();
+    int? txId;
+    if (createTransaction && assetId != null) {
+      txId = await _recordSavingsTransaction(
+        assetId: assetId,
+        amount: actualAmount,
+        isDeposit: false,
+        goalTitle: goal.title,
+        date: txDate,
+        note: note,
+      );
+    }
+
+    await db.insert('goal_allocations', {
+      'goal_id': goalId,
+      'asset_id': assetId,
+      'amount': -actualAmount,
+      'date': ymd(txDate),
+      'note': note.trim().isEmpty ? 'Penarikan Dana' : note.trim(),
+      'tx_id': txId,
+    });
+
+    final newAmount = goal.currentAmount - actualAmount;
+    await db.update(
+      'savings_goals',
+      {
+        'current_amount': newAmount,
+        if (goal.status == 'completed' && newAmount < goal.targetAmount) 'status': 'active',
+      },
+      where: 'id = ?',
+      whereArgs: [goalId],
+    );
+
+    _changed();
+  }
+
+  /// Memindahkan saldo antar target menabung
+  Future<void> transferBetweenGoals({
+    required int fromGoalId,
+    required int toGoalId,
+    required int amount,
+    String note = '',
+  }) async {
+    if (amount <= 0 || fromGoalId == toGoalId) return;
+    final db = await _d.db;
+    final fromGoal = await getSavingsGoal(fromGoalId);
+    final toGoal = await getSavingsGoal(toGoalId);
+    if (fromGoal == null || toGoal == null) return;
+
+    final actualAmount = amount.clamp(0, fromGoal.currentAmount);
+    if (actualAmount <= 0) return;
+
+    final now = DateTime.now();
+    final today = ymd(now);
+
+    // Pengurangan dari fromGoal
+    await db.insert('goal_allocations', {
+      'goal_id': fromGoalId,
+      'amount': -actualAmount,
+      'date': today,
+      'note': 'Dipindah ke target "${toGoal.title}"${note.isNotEmpty ? ": $note" : ""}',
+    });
+    final newFromAmount = fromGoal.currentAmount - actualAmount;
+    await db.update(
+      'savings_goals',
+      {
+        'current_amount': newFromAmount,
+        if (fromGoal.status == 'completed' && newFromAmount < fromGoal.targetAmount)
+          'status': 'active',
+      },
+      where: 'id = ?',
+      whereArgs: [fromGoalId],
+    );
+
+    // Penambahan ke toGoal
+    await db.insert('goal_allocations', {
+      'goal_id': toGoalId,
+      'amount': actualAmount,
+      'date': today,
+      'note': 'Diterima dari target "${fromGoal.title}"${note.isNotEmpty ? ": $note" : ""}',
+    });
+    final newToAmount = toGoal.currentAmount + actualAmount;
+    final isToDone = newToAmount >= toGoal.targetAmount && toGoal.targetAmount > 0;
+    await db.update(
+      'savings_goals',
+      {
+        'current_amount': newToAmount,
+        if (isToDone) 'status': 'completed',
+      },
+      where: 'id = ?',
+      whereArgs: [toGoalId],
+    );
+
+    _changed();
+  }
+
+  /// Mengambil seluruh riwayat alokasi dana untuk suatu target
+  Future<List<GoalAllocation>> goalAllocations(int goalId) async {
+    final db = await _d.db;
+    final rows = await db.rawQuery('''
+      SELECT ga.*, a.name AS asset_name
+      FROM goal_allocations ga
+      LEFT JOIN assets a ON a.id = ga.asset_id
+      WHERE ga.goal_id = ?
+      ORDER BY ga.date DESC, ga.id DESC
+    ''', [goalId]);
+    return rows.map(GoalAllocation.fromMap).toList();
+  }
 }

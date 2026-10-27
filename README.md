@@ -43,20 +43,27 @@
 - Tetapkan batas anggaran pengeluaran bulanan per kategori (misal: *Makanan Rp 2.000.000/bulan*).
 - Indikator progres visual interaktif: persentase pemakaian, sisa anggaran riil, serta tanda bahaya ketika mendekati atau melebihi batas (*overbudget*).
 
-### 4. 🔁 Transaksi Berulang & Pengingat Tagihan
+### 4. 🎯 Target Menabung (Savings Goals)
+- **Kumpulkan Dana Impian**: Rencanakan tujuan menabung spesifik (contoh: *Beli Laptop Rp 5.000.000*, *Dana Darurat Rp 10.000.000*, *Target Tabungan Bulan Ini Rp 2.000.000*).
+- **Progres Visual & Deadline**: Batang kemajuan (*progress bar*) otomatis, persentase ketercapaian, sisa kekurangan dana, dan sisa hari menuju batas waktu (*deadline*).
+- **Pilihan Batas Waktu Cerdas**: Saat deadline berakhir sebelum 100% tercapai, pengguna dapat memperpanjang waktu, menutup/menyelesaikan target dengan nominal saat ini, atau memindahkan sisa saldo ke target lain.
+- **Alokasi Dana Terintegrasi**: Setor dana langsung dari akun aset (dengan opsi memotong saldo arus kas atau alokasi virtual), tarik dana, maupun transfer saldo antar-target tanpa perlu mencatat ganda.
+
+### 5. 🔁 Transaksi Berulang & Pengingat Tagihan
 - Jadwalkan pembayaran rutin (Harian, Mingguan, Bulanan, Tahunan) untuk sewa, langganan, internet, listrik, gaji, dll.
 - Opsi otomatisasi pencatatan saat jatuh tempo tiba dan pengingat tagihan aktif.
 
-### 5. 💼 Pengelompokan & Manajemen Akun Aset
+### 6. 💼 Pengelompokan & Manajemen Akun Aset
+- Tab terpadu di menu Aset: **Daftar Aset** dan **Target Menabung**.
 - Kelompokkan aset keuangan: Kas/Tunai, Rekening Bank, Dompet Digital (*E-Wallet*), Kartu Kredit, hingga Investasi.
 - Urutkan dan kelola master data **Kategori** (pemasukan/pengeluaran) serta **Tag** transaksi sesuai kebutuhan pribadi Anda.
 
-### 6. 🔒 Keamanan & Privasi
+### 7. 🔒 Keamanan & Privasi
 - **Kunci Aplikasi dengan PIN 6 Digit**: Dilengkapi enkripsi *hashing* SHA-256 + *cryptographic salt*.
 - **Autentikasi Biometrik**: Buka kunci dengan cepat menggunakan Sidik Jari (*Fingerprint*) atau Pemindai Wajah (*Face ID*).
 - **Auto-Lock Timeout**: Pengaturan penguncian otomatis (Langsung saat keluar, 1 menit, atau 5 menit).
 
-### 7. 💾 Cadangkan & Pulihkan Data (Backup & Restore)
+### 8. 💾 Cadangkan & Pulihkan Data (Backup & Restore)
 - **Ekspor & Impor Database**: Buat salinan cadangan berkas `.ksbackup` (JSON) untuk dipindahkan ke perangkat baru.
 - **Ekspor Laporan Spreadsheet (CSV)**: Unduh seluruh riwayat transaksi untuk dibuka di Microsoft Excel atau Google Sheets.
 
@@ -134,20 +141,27 @@ lib/
 - Tetapkan batas anggaran pengeluaran bulanan per kategori (misal: *Makanan Rp 2.000.000/bulan*).
 - Indikator progres visual interaktif: persentase pemakaian, sisa anggaran riil, serta tanda bahaya ketika mendekati atau melebihi batas (*overbudget*).
 
-### 4. 🔁 Transaksi Berulang & Pengingat Tagihan
+### 4. 🎯 Target Menabung (Savings Goals)
+- **Kumpulkan Dana Impian**: Rencanakan tujuan menabung spesifik (contoh: *Beli Laptop Rp 5.000.000*, *Dana Darurat Rp 10.000.000*, *Target Tabungan Bulan Ini Rp 2.000.000*).
+- **Progres Visual & Deadline**: Batang kemajuan (*progress bar*) otomatis, persentase ketercapaian, sisa kekurangan dana, dan sisa hari menuju batas waktu (*deadline*).
+- **Pilihan Batas Waktu Cerdas**: Saat deadline berakhir sebelum 100% tercapai, pengguna dapat memperpanjang waktu, menutup/menyelesaikan target dengan nominal saat ini, atau memindahkan sisa saldo ke target lain.
+- **Alokasi Dana Terintegrasi**: Setor dana langsung dari akun aset (dengan opsi memotong saldo arus kas atau alokasi virtual), tarik dana, maupun transfer saldo antar-target tanpa perlu mencatat ganda.
+
+### 5. 🔁 Transaksi Berulang & Pengingat Tagihan
 - Jadwalkan pembayaran rutin (Harian, Mingguan, Bulanan, Tahunan) untuk sewa, langganan, internet, listrik, gaji, dll.
 - Opsi otomatisasi pencatatan saat jatuh tempo tiba dan pengingat tagihan aktif.
 
-### 5. 💼 Pengelompokan & Manajemen Akun Aset
+### 6. 💼 Pengelompokan & Manajemen Akun Aset
+- Tab terpadu di menu Aset: **Daftar Aset** dan **Target Menabung**.
 - Kelompokkan aset keuangan: Kas/Tunai, Rekening Bank, Dompet Digital (*E-Wallet*), Kartu Kredit, hingga Investasi.
 - Urutkan dan kelola master data **Kategori** (pemasukan/pengeluaran) serta **Tag** transaksi sesuai kebutuhan pribadi Anda.
 
-### 6. 🔒 Keamanan & Privasi
+### 7. 🔒 Keamanan & Privasi
 - **Kunci Aplikasi dengan PIN 6 Digit**: Dilengkapi enkripsi *hashing* SHA-256 + *cryptographic salt*.
 - **Autentikasi Biometrik**: Buka kunci dengan cepat menggunakan Sidik Jari (*Fingerprint*) atau Pemindai Wajah (*Face ID*).
 - **Auto-Lock Timeout**: Pengaturan penguncian otomatis (Langsung saat keluar, 1 menit, atau 5 menit).
 
-### 7. 💾 Cadangkan & Pulihkan Data (Backup & Restore)
+### 8. 💾 Cadangkan & Pulihkan Data (Backup & Restore)
 - **Ekspor & Impor Database**: Buat salinan cadangan berkas `.ksbackup` (JSON) untuk dipindahkan ke perangkat baru.
 - **Ekspor Laporan Spreadsheet (CSV)**: Unduh seluruh riwayat transaksi untuk dibuka di Microsoft Excel atau Google Sheets.
 

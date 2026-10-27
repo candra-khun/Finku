@@ -69,6 +69,33 @@ class AppDb {
         note TEXT NOT NULL DEFAULT ''
       )
     ''').catchError((_) {});
+    // Pastikan tabel savings_goals & goal_allocations tersedia
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS savings_goals(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        title TEXT NOT NULL,
+        target_amount INTEGER NOT NULL,
+        current_amount INTEGER NOT NULL DEFAULT 0,
+        target_date TEXT,
+        color INTEGER NOT NULL DEFAULT 2533755,
+        icon TEXT NOT NULL DEFAULT 'flag',
+        status TEXT NOT NULL DEFAULT 'active',
+        asset_id INTEGER REFERENCES assets(id) ON DELETE SET NULL,
+        note TEXT NOT NULL DEFAULT '',
+        created_at TEXT NOT NULL
+      )
+    ''').catchError((_) {});
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS goal_allocations(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        goal_id INTEGER NOT NULL REFERENCES savings_goals(id) ON DELETE CASCADE,
+        asset_id INTEGER REFERENCES assets(id) ON DELETE SET NULL,
+        amount INTEGER NOT NULL,
+        date TEXT NOT NULL,
+        note TEXT NOT NULL DEFAULT '',
+        tx_id INTEGER REFERENCES transactions(id) ON DELETE SET NULL
+      )
+    ''').catchError((_) {});
     return db;
   }
 
@@ -159,6 +186,30 @@ class AppDb {
         auto_record INTEGER NOT NULL DEFAULT 0,
         is_active INTEGER NOT NULL DEFAULT 1,
         note TEXT NOT NULL DEFAULT ''
+      )''');
+    await d.execute('''
+      CREATE TABLE savings_goals(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        title TEXT NOT NULL,
+        target_amount INTEGER NOT NULL,
+        current_amount INTEGER NOT NULL DEFAULT 0,
+        target_date TEXT,
+        color INTEGER NOT NULL DEFAULT 2533755,
+        icon TEXT NOT NULL DEFAULT 'flag',
+        status TEXT NOT NULL DEFAULT 'active',
+        asset_id INTEGER REFERENCES assets(id) ON DELETE SET NULL,
+        note TEXT NOT NULL DEFAULT '',
+        created_at TEXT NOT NULL
+      )''');
+    await d.execute('''
+      CREATE TABLE goal_allocations(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        goal_id INTEGER NOT NULL REFERENCES savings_goals(id) ON DELETE CASCADE,
+        asset_id INTEGER REFERENCES assets(id) ON DELETE SET NULL,
+        amount INTEGER NOT NULL,
+        date TEXT NOT NULL,
+        note TEXT NOT NULL DEFAULT '',
+        tx_id INTEGER REFERENCES transactions(id) ON DELETE SET NULL
       )''');
 
     // Data awal: tiga grup aset utama beserta satu aset di tiap grup.

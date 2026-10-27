@@ -50,6 +50,8 @@ class BackupService {
       'closings': await db.query('closings'),
       'budgets': await db.query('budgets'),
       'recurring_transactions': await db.query('recurring_transactions'),
+      'savings_goals': await db.query('savings_goals'),
+      'goal_allocations': await db.query('goal_allocations'),
     };
   }
 
@@ -199,6 +201,16 @@ class BackupService {
       final recurring = (decoded['recurring_transactions'] as List?) ?? [];
       for (final r in recurring) {
         await txn.insert('recurring_transactions', Map<String, dynamic>.from(r as Map)).catchError((_) => 0);
+      }
+
+      final goals = (decoded['savings_goals'] as List?) ?? [];
+      for (final r in goals) {
+        await txn.insert('savings_goals', Map<String, dynamic>.from(r as Map)).catchError((_) => 0);
+      }
+
+      final allocations = (decoded['goal_allocations'] as List?) ?? [];
+      for (final r in allocations) {
+        await txn.insert('goal_allocations', Map<String, dynamic>.from(r as Map)).catchError((_) => 0);
       }
     });
 

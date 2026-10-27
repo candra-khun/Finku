@@ -400,3 +400,121 @@ class RecurringTx {
     );
   }
 }
+
+class SavingsGoal {
+  final int id;
+  final String title;
+  final int targetAmount;
+  final int currentAmount;
+  final DateTime? targetDate;
+  final int color;
+  final String icon;
+  final String status; // 'active', 'completed', 'cancelled'
+  final int? assetId;
+  final String? assetName;
+  final String note;
+  final DateTime createdAt;
+
+  const SavingsGoal({
+    required this.id,
+    required this.title,
+    required this.targetAmount,
+    required this.currentAmount,
+    this.targetDate,
+    required this.color,
+    required this.icon,
+    required this.status,
+    this.assetId,
+    this.assetName,
+    required this.note,
+    required this.createdAt,
+  });
+
+  bool get isCompleted => status == 'completed' || currentAmount >= targetAmount;
+  int get remainingAmount => (targetAmount - currentAmount).clamp(0, targetAmount);
+  double get progress => targetAmount <= 0 ? 1.0 : (currentAmount / targetAmount).clamp(0.0, 1.0);
+  int get progressPercent => (progress * 100).round();
+
+  bool get hasDeadline => targetDate != null;
+
+  int? get daysRemaining {
+    if (targetDate == null) return null;
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final deadline = DateTime(targetDate!.year, targetDate!.month, targetDate!.day);
+    return deadline.difference(today).inDays;
+  }
+
+  bool get isOverdue {
+    final days = daysRemaining;
+    return days != null && days < 0 && !isCompleted;
+  }
+
+  String get deadlineStatusLabel {
+    if (targetDate == null) return 'Tanpa batas waktu';
+    final days = daysRemaining!;
+    if (isCompleted) return 'Target Tercapai! 🎉';
+    if (days < 0) return 'Batas waktu lewat ${-days} hari';
+    if (days == 0) return 'Hari ini batas waktu terakhir!';
+    if (days == 1) return 'Sisa 1 hari lagi';
+    if (days < 30) return 'Sisa $days hari lagi';
+    final months = (days / 30).floor();
+    final remDays = days % 30;
+    if (remDays == 0) return 'Sisa $months bulan lagi';
+    return 'Sisa $months bln $remDays hari';
+  }
+
+  factory SavingsGoal.fromMap(Map<String, Object?> m) {
+    return SavingsGoal(
+      id: m['id'] as int,
+      title: m['title'] as String,
+      targetAmount: m['target_amount'] as int,
+      currentAmount: (m['current_amount'] as int?) ?? 0,
+      targetDate: m['target_date'] != null ? parseYmd(m['target_date'] as String) : null,
+      color: (m['color'] as int?) ?? 0xFF00897B,
+      icon: (m['icon'] as String?) ?? 'flag',
+      status: (m['status'] as String?) ?? 'active',
+      assetId: m['asset_id'] as int?,
+      assetName: m['asset_name'] as String?,
+      note: (m['note'] as String?) ?? '',
+      createdAt: m['created_at'] != null ? DateTime.parse(m['created_at'] as String) : DateTime.now(),
+    );
+  }
+}
+
+class GoalAllocation {
+  final int id;
+  final int goalId;
+  final int? assetId;
+  final String? assetName;
+  final int amount; // Positif = simpan/setor, Negatif = tarik
+  final DateTime date;
+  final String note;
+  final int? txId;
+
+  const GoalAllocation({
+    required this.id,
+    required this.goalId,
+    this.assetId,
+    this.assetName,
+    required this.amount,
+    required this.date,
+    required this.note,
+    this.txId,
+  });
+
+  bool get isDeposit => amount >= 0;
+
+  factory GoalAllocation.fromMap(Map<String, Object?> m) {
+    return GoalAllocation(
+      id: m['id'] as int,
+      goalId: m['goal_id'] as int,
+      assetId: m['asset_id'] as int?,
+      assetName: m['asset_name'] as String?,
+      amount: m['amount'] as int,
+      date: parseYmd(m['date'] as String),
+      note: (m['note'] as String?) ?? '',
+      txId: m['tx_id'] as int?,
+    );
+  }
+}

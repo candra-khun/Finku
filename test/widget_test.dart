@@ -64,4 +64,65 @@ void main() {
     final feb = computeNextDueDate(jan31, 'monthly', 1, 31);
     expect(feb, DateTime(2026, 2, 28)); // 2026 bukan tahun kabisat
   });
+
+  test('perhitungan modul target menabung (savings goals)', () {
+    final now = DateTime.now();
+    final deadlineFuture = now.add(const Duration(days: 10));
+    final goal = SavingsGoal(
+      id: 1,
+      title: 'Beli Laptop',
+      targetAmount: 2000000,
+      currentAmount: 1900000,
+      targetDate: deadlineFuture,
+      color: 0xFF00897B,
+      icon: 'laptop',
+      status: 'active',
+      note: 'Cicil dari gaji bulanan',
+      createdAt: now,
+    );
+
+    expect(goal.remainingAmount, 100000);
+    expect(goal.progress, 0.95);
+    expect(goal.progressPercent, 95);
+    expect(goal.isCompleted, false);
+    expect(goal.isOverdue, false);
+    expect(goal.hasDeadline, true);
+    expect(goal.daysRemaining, 10);
+
+    // Kasus target selesai 100%
+    final goalDone = SavingsGoal(
+      id: 2,
+      title: 'Beli HP',
+      targetAmount: 2000000,
+      currentAmount: 2000000,
+      color: 0xFF00897B,
+      icon: 'phone',
+      status: 'completed',
+      note: '',
+      createdAt: now,
+    );
+    expect(goalDone.remainingAmount, 0);
+    expect(goalDone.progress, 1.0);
+    expect(goalDone.progressPercent, 100);
+    expect(goalDone.isCompleted, true);
+
+    // Kasus deadline lewat dan belum 100%
+    final deadlinePast = now.subtract(const Duration(days: 3));
+    final goalOverdue = SavingsGoal(
+      id: 3,
+      title: 'Target Bulan Ini',
+      targetAmount: 2000000,
+      currentAmount: 1900000,
+      targetDate: deadlinePast,
+      color: 0xFF00897B,
+      icon: 'flag',
+      status: 'active',
+      note: '',
+      createdAt: now.subtract(const Duration(days: 30)),
+    );
+    expect(goalOverdue.isOverdue, true);
+    expect(goalOverdue.isCompleted, false);
+    expect(goalOverdue.progressPercent, 95);
+    expect(goalOverdue.daysRemaining! < 0, true);
+  });
 }

@@ -6,77 +6,134 @@ import '../../core/format.dart';
 import '../../core/widgets.dart';
 import '../../data/models.dart';
 import '../../data/repository.dart';
+import '../target/goal_form_page.dart';
+import '../target/target_goals_view.dart';
 import 'asset_detail_page.dart';
 
 typedef _AsetData = (List<AssetGroup>, List<AssetBalance>);
 
-/// Satu halaman dengan dua bagian: aset utama (Tunai, Bank, Kartu) di atas
-/// dan grup aset tambahan buatan pengguna di bawah.
-class AsetPage extends StatelessWidget {
+/// Satu halaman dengan dua tab: Daftar Aset (utama & tambahan) dan Target Menabung (Savings Goals)
+class AsetPage extends StatefulWidget {
   const AsetPage({super.key});
 
   @override
+  State<AsetPage> createState() => _AsetPageState();
+}
+
+class _AsetPageState extends State<AsetPage> with SingleTickerProviderStateMixin {
+  late TabController _tabController;
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 2, vsync: this);
+    _tabController.addListener(() {
+      if (!_tabController.indexIsChanging) {
+        setState(() {});
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final isAsetTab = _tabController.index == 0;
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Aset'),
+        title: const Text('Aset & Target'),
+        bottom: TabBar(
+          controller: _tabController,
+          tabs: const [
+            Tab(
+              icon: Icon(Icons.account_balance_wallet_outlined),
+              text: 'Daftar Aset',
+            ),
+            Tab(
+              icon: Icon(Icons.flag_outlined),
+              text: 'Target Menabung',
+            ),
+          ],
+        ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.swap_vert),
-            tooltip: 'Urutkan grup',
-            onPressed: () => _showReorderGroups(context),
-          ),
+          if (isAsetTab)
+            IconButton(
+              icon: const Icon(Icons.swap_vert),
+              tooltip: 'Urutkan grup',
+              onPressed: () => _showReorderGroups(context),
+            ),
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _showAddMenu(context),
-        icon: const Icon(Icons.add),
-        label: const Text('Tambah'),
-      ),
-      body: RepoFuture<_AsetData>(
-        load: (repo) async => (await repo.groups(), await repo.assetBalances()),
-        builder: (context, data) {
-          final (groups, balances) = data;
-          var assets = 0;
-          var debts = 0;
-          for (final b in balances) {
-            if (b.balance >= 0) {
-              assets += b.balance;
-            } else {
-              debts += b.balance;
-            }
+        onPressed: () {
+          if (isAsetTab) {
+            _showAddMenu(context);
+          } else {
+            openGoalForm(context);
           }
-          final main = groups.where((g) => g.isDefault).toList();
-          final extra = groups.where((g) => !g.isDefault).toList();
-          return ListView(
-            padding: const EdgeInsets.only(bottom: 96),
-            children: [
-              _SummaryCard(assets: assets, debts: debts),
-              const _SectionHeader('Aset utama'),
-              for (final g in main)
+        },
+        icon: const Icon(Icons.add),
+        label: Text(isAsetTab ? 'Tambah Aset' : 'Buat Target'),
+      ),
+      body: TabBarView(
+        controller: _tabController,
+        children: [
+          _buildAsetListView(),
+          const TargetGoalsView(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAsetListView() {
+    return RepoFuture<_AsetData>(
+      load: (repo) async => (await repo.groups(), await repo.assetBalances()),
+      builder: (context, data) {
+        final (groups, balances) = data;
+        var assets = 0;
+        var debts = 0;
+        for (final b in balances) {
+          if (b.balance >= 0) {
+            assets += b.balance;
+          } else {
+            debts += b.balance;
+          }
+        }
+        final main = groups.where((g) => g.isDefault).toList();
+        final extra = groups.where((g) => !g.isDefault).toList();
+        return ListView(
+          padding: const EdgeInsets.only(bottom: 96),
+          children: [
+            _SummaryCard(assets: assets, debts: debts),
+            const _SectionHeader('Aset utama'),
+            for (final g in main)
+              _GroupCard(
+                group: g,
+                items: balances.where((b) => b.asset.groupId == g.id).toList(),
+              ),
+            const Divider(height: 32),
+            const _SectionHeader('Aset tambahan'),
+            if (extra.isEmpty)
+              const Padding(
+                padding: EdgeInsets.fromLTRB(16, 4, 16, 16),
+                child: Text(
+                  'Belum ada grup tambahan. Ketuk Tambah untuk membuat grup aset baru, misalnya Dompet digital atau Investasi.',
+                ),
+              )
+            else
+              for (final g in extra)
                 _GroupCard(
                   group: g,
                   items: balances.where((b) => b.asset.groupId == g.id).toList(),
                 ),
-              const Divider(height: 32),
-              const _SectionHeader('Aset tambahan'),
-              if (extra.isEmpty)
-                const Padding(
-                  padding: EdgeInsets.fromLTRB(16, 4, 16, 16),
-                  child: Text(
-                    'Belum ada grup tambahan. Ketuk Tambah untuk membuat grup aset baru, misalnya Dompet digital atau Investasi.',
-                  ),
-                )
-              else
-                for (final g in extra)
-                  _GroupCard(
-                    group: g,
-                    items: balances.where((b) => b.asset.groupId == g.id).toList(),
-                  ),
-            ],
-          );
-        },
-      ),
+          ],
+        );
+      },
     );
   }
 

@@ -11,6 +11,7 @@ import '../kategori/kelola_kategori_page.dart';
 import '../keamanan/kelola_keamanan_page.dart';
 import '../tag/kelola_tag_page.dart';
 import '../tagihan/tagihan_page.dart';
+import '../target/target_page.dart';
 
 enum CsvPeriodMode { all, thisMonth, thisYear, custom }
 
@@ -517,6 +518,26 @@ class _LainnyaPageState extends State<LainnyaPage> {
                 ),
                 child: Column(
                   children: [
+                    ListTile(
+                      leading: CircleAvatar(
+                        backgroundColor: Colors.teal.withValues(alpha: 0.15),
+                        child:
+                            const Icon(Icons.flag_outlined, color: Colors.teal),
+                      ),
+                      title: const Text('Target Menabung (Goals)',
+                          style: TextStyle(fontWeight: FontWeight.w600)),
+                      subtitle: const Text(
+                          'Kumpulkan dana impian, pantau progress, dan alokasi tabungan'),
+                      trailing: const Icon(Icons.chevron_right),
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const TargetPage()),
+                      ),
+                    ),
+                    Divider(
+                        height: 1,
+                        indent: 64,
+                        color: isDark ? Colors.white12 : Colors.black12),
                     ListTile(
                       leading: CircleAvatar(
                         backgroundColor: Colors.teal.withValues(alpha: 0.15),
