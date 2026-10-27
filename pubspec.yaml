@@ -1,0 +1,33 @@
+name: keuangan_saku
+description: Aplikasi pengelola keuangan pribadi (transaksi, statistik, aset).
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.4.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  intl: any
+  sqflite: ^2.3.3
+  path: ^1.9.0
+  provider: ^6.1.2
+  fl_chart: ^0.69.0
+  table_calendar: ^3.1.2
+  path_provider: ^2.1.6
+  share_plus: ^13.3.1
+  file_picker: ^13.3.0
+  local_auth: ^3.0.2
+  crypto: ^3.0.8
+  shared_preferences: ^2.5.6
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true
