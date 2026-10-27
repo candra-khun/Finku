@@ -1,9 +1,11 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../../core/format.dart';
 import '../../core/widgets.dart';
 import '../../data/models.dart';
+import '../../data/repository.dart';
 
 enum StatMode { month, week, year, range }
 
@@ -57,6 +59,12 @@ class _StatistikPageState extends State<StatistikPage> {
   DateTime _anchor = DateTime.now();
   DateTimeRange? _range;
   String _selectedType = 'expense'; // Default Pengeluaran seperti pada gambar
+
+  // Filter Aset dan Tag
+  int? _filterAssetId;
+  String? _filterAssetName;
+  int? _filterTagId;
+  String? _filterTagName;
 
   static const _modeLabels = {
     StatMode.month: 'Bulanan',
@@ -160,6 +168,220 @@ class _StatistikPageState extends State<StatistikPage> {
     }
   }
 
+  Future<void> _pickAssetFilter() async {
+    final repo = context.read<Repo>();
+    final assets = await repo.assets();
+    final nonArchived = assets.where((a) => !a.archived).toList();
+    if (!mounted) return;
+
+    await showModalBottomSheet<void>(
+      context: context,
+      showDragHandle: true,
+      builder: (ctx) {
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                child: Text(
+                  'Filter Berdasarkan Aset',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                ),
+              ),
+              const Divider(height: 1),
+              ListTile(
+                leading: const Icon(Icons.all_inclusive),
+                title: const Text('Semua Aset'),
+                trailing: _filterAssetId == null ? const Icon(Icons.check, color: Colors.teal) : null,
+                onTap: () {
+                  setState(() {
+                    _filterAssetId = null;
+                    _filterAssetName = null;
+                  });
+                  Navigator.pop(ctx);
+                },
+              ),
+              Flexible(
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: nonArchived.length,
+                  itemBuilder: (context, i) {
+                    final a = nonArchived[i];
+                    final isSelected = a.id == _filterAssetId;
+                    return ListTile(
+                      leading: const Icon(Icons.account_balance_wallet_outlined),
+                      title: Text(a.name),
+                      trailing: isSelected ? const Icon(Icons.check, color: Colors.teal) : null,
+                      onTap: () {
+                        setState(() {
+                          _filterAssetId = a.id;
+                          _filterAssetName = a.name;
+                        });
+                        Navigator.pop(ctx);
+                      },
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _pickTagFilter() async {
+    final repo = context.read<Repo>();
+    final tags = await repo.tags();
+    if (!mounted) return;
+
+    await showModalBottomSheet<void>(
+      context: context,
+      showDragHandle: true,
+      builder: (ctx) {
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                child: Text(
+                  'Filter Berdasarkan Tag',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                ),
+              ),
+              const Divider(height: 1),
+              ListTile(
+                leading: const Icon(Icons.all_inclusive),
+                title: const Text('Semua Tag'),
+                trailing: _filterTagId == null ? const Icon(Icons.check, color: Colors.teal) : null,
+                onTap: () {
+                  setState(() {
+                    _filterTagId = null;
+                    _filterTagName = null;
+                  });
+                  Navigator.pop(ctx);
+                },
+              ),
+              if (tags.isEmpty)
+                const Padding(
+                  padding: EdgeInsets.all(24),
+                  child: Text('Belum ada tag yang dibuat', style: TextStyle(color: Colors.grey)),
+                )
+              else
+                Flexible(
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: tags.length,
+                    itemBuilder: (context, i) {
+                      final t = tags[i];
+                      final isSelected = t.id == _filterTagId;
+                      return ListTile(
+                        leading: const Icon(Icons.label_outline),
+                        title: Text('#${t.name}'),
+                        trailing: isSelected ? const Icon(Icons.check, color: Colors.teal) : null,
+                        onTap: () {
+                          setState(() {
+                            _filterTagId = t.id;
+                            _filterTagName = t.name;
+                          });
+                          Navigator.pop(ctx);
+                        },
+                      );
+                    },
+                  ),
+                ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _filterBar(BuildContext context) {
+    final hasAsset = _filterAssetId != null;
+    final hasTag = _filterTagId != null;
+    final theme = Theme.of(context);
+
+    return Padding(
+      padding: const EdgeInsets.only(left: 16, right: 16, bottom: 8),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: [
+            // Filter Aset Chip
+            FilterChip(
+              avatar: Icon(
+                Icons.account_balance_wallet,
+                size: 16,
+                color: hasAsset ? theme.colorScheme.primary : Colors.grey,
+              ),
+              label: Text(
+                hasAsset ? _filterAssetName! : 'Semua Aset',
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: hasAsset ? FontWeight.bold : FontWeight.normal,
+                ),
+              ),
+              selected: hasAsset,
+              onSelected: (_) => _pickAssetFilter(),
+              deleteIcon: hasAsset ? const Icon(Icons.close, size: 16) : null,
+              onDeleted: hasAsset
+                  ? () => setState(() {
+                        _filterAssetId = null;
+                        _filterAssetName = null;
+                      })
+                  : null,
+            ),
+            const SizedBox(width: 8),
+
+            // Filter Tag Chip
+            FilterChip(
+              avatar: Icon(
+                Icons.label,
+                size: 16,
+                color: hasTag ? theme.colorScheme.primary : Colors.grey,
+              ),
+              label: Text(
+                hasTag ? '#$_filterTagName!' : 'Semua Tag',
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: hasTag ? FontWeight.bold : FontWeight.normal,
+                ),
+              ),
+              selected: hasTag,
+              onSelected: (_) => _pickTagFilter(),
+              deleteIcon: hasTag ? const Icon(Icons.close, size: 16) : null,
+              onDeleted: hasTag
+                  ? () => setState(() {
+                        _filterTagId = null;
+                        _filterTagName = null;
+                      })
+                  : null,
+            ),
+
+            if (hasAsset || hasTag) ...[
+              const SizedBox(width: 8),
+              ActionChip(
+                avatar: const Icon(Icons.restart_alt, size: 16),
+                label: const Text('Reset', style: TextStyle(fontSize: 12)),
+                onPressed: () {
+                  setState(() {
+                    _filterAssetId = null;
+                    _filterAssetName = null;
+                    _filterTagId = null;
+                    _filterTagName = null;
+                  });
+                },
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final period = _period;
@@ -170,11 +392,21 @@ class _StatistikPageState extends State<StatistikPage> {
     return Scaffold(
       body: SafeArea(
         child: RepoFuture<_StatData>(
-          keyValue: (_selectedType, period),
+          keyValue: (_selectedType, period, _filterAssetId, _filterTagId),
           load: (repo) async {
-            final totals = await repo.totals(period.from, period.to);
-            final stats =
-                await repo.categoryStats(_selectedType, period.from, period.to);
+            final totals = await repo.totals(
+              period.from,
+              period.to,
+              assetId: _filterAssetId,
+              tagId: _filterTagId,
+            );
+            final stats = await repo.categoryStats(
+              _selectedType,
+              period.from,
+              period.to,
+              assetId: _filterAssetId,
+              tagId: _filterTagId,
+            );
             return _StatData(totals, stats);
           },
           builder: (context, data) {
@@ -270,7 +502,10 @@ class _StatistikPageState extends State<StatistikPage> {
                   ),
                 ),
 
-                // 2. Tab Bar: Pendapatan Rp ...    Pengeluaran Rp ...
+                // 2. Baris Filter Aset & Tag
+                _filterBar(context),
+
+                // 3. Tab Bar: Pendapatan Rp ...    Pengeluaran Rp ...
                 Row(
                   children: [
                     _tabButton(
@@ -293,14 +528,16 @@ class _StatistikPageState extends State<StatistikPage> {
                   color: isDark ? Colors.white12 : Colors.black12,
                 ),
 
-                // 3. Konten: Diagram Pie Solid & List Kategori
+                // 4. Konten: Diagram Pie Solid & List Kategori
                 Expanded(
                   child: stats.isEmpty || totalAmount == 0
                       ? Center(
                           child: Text(
-                            _selectedType == 'income'
-                                ? 'Belum ada pendapatan pada periode ini.'
-                                : 'Belum ada pengeluaran pada periode ini.',
+                            (_filterAssetId != null || _filterTagId != null)
+                                ? 'Tidak ada transaksi untuk filter yang dipilih.'
+                                : (_selectedType == 'income'
+                                    ? 'Belum ada pendapatan pada periode ini.'
+                                    : 'Belum ada pengeluaran pada periode ini.'),
                             style: TextStyle(
                               color: textColor.withValues(alpha: 0.5),
                               fontSize: 14,

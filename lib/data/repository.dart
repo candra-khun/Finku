@@ -475,14 +475,37 @@ class Repo extends ChangeNotifier {
         .toList();
   }
 
-  Future<Totals> totals(DateTime from, DateTime to) async {
+  Future<Totals> totals(
+    DateTime from,
+    DateTime to, {
+    int? assetId,
+    int? tagId,
+  }) async {
     final db = await _d.db;
+    final whereArgs = <Object?>[];
+    final conditions = <String>['t.date >= ?', 't.date <= ?'];
+    whereArgs.add(ymd(from));
+    whereArgs.add(ymd(to));
+
+    String joinClause = '';
+    if (tagId != null) {
+      joinClause += ' JOIN transaction_tags tt ON tt.transaction_id = t.id AND tt.tag_id = ?';
+      whereArgs.add(tagId);
+    }
+
+    if (assetId != null) {
+      conditions.add('t.asset_id = ?');
+      whereArgs.add(assetId);
+    }
+
+    final where = conditions.join(' AND ');
     final r = await db.rawQuery('''
       SELECT
-        COALESCE(SUM(CASE WHEN type = 'income' THEN amount ELSE 0 END), 0) AS inc,
-        COALESCE(SUM(CASE WHEN type = 'expense' THEN amount ELSE 0 END), 0) AS exp
-      FROM transactions WHERE date >= ? AND date <= ?
-    ''', [ymd(from), ymd(to)]);
+        COALESCE(SUM(CASE WHEN t.type = 'income' THEN t.amount ELSE 0 END), 0) AS inc,
+        COALESCE(SUM(CASE WHEN t.type = 'expense' THEN t.amount ELSE 0 END), 0) AS exp
+      FROM transactions t $joinClause
+      WHERE $where
+    ''', whereArgs);
     return Totals(r.first['inc'] as int, r.first['exp'] as int);
   }
 
@@ -521,16 +544,41 @@ class Repo extends ChangeNotifier {
   // -------------------------------------------------------------- statistik
 
   Future<List<CategoryStat>> categoryStats(
-      String type, DateTime from, DateTime to) async {
+    String type,
+    DateTime from,
+    DateTime to, {
+    int? assetId,
+    int? tagId,
+  }) async {
     final db = await _d.db;
+    final whereArgs = <Object?>[];
+    final conditions = <String>['t.type = ?', 't.date >= ?', 't.date <= ?'];
+    whereArgs.add(type);
+    whereArgs.add(ymd(from));
+    whereArgs.add(ymd(to));
+
+    String joinClause = '';
+    if (tagId != null) {
+      joinClause += ' JOIN transaction_tags tt ON tt.transaction_id = t.id AND tt.tag_id = ?';
+      whereArgs.add(tagId);
+    }
+
+    if (assetId != null) {
+      conditions.add('t.asset_id = ?');
+      whereArgs.add(assetId);
+    }
+
+    final where = conditions.join(' AND ');
     final rows = await db.rawQuery('''
       SELECT c.id AS id, c.name AS name, c.type AS type, c.color AS color,
              SUM(t.amount) AS total
-      FROM transactions t JOIN categories c ON c.id = t.category_id
-      WHERE t.type = ? AND t.date >= ? AND t.date <= ?
+      FROM transactions t
+      JOIN categories c ON c.id = t.category_id
+      $joinClause
+      WHERE $where
       GROUP BY c.id
       ORDER BY total DESC
-    ''', [type, ymd(from), ymd(to)]);
+    ''', whereArgs);
     return rows
         .map((r) => CategoryStat(Category.fromMap(r), r['total'] as int))
         .toList();
