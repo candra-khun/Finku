@@ -174,7 +174,7 @@ class SecurityService extends ChangeNotifier {
     // Jangan catat waktu jeda jika sedang dalam proses dialog autentikasi biometrik
     if (_isAuthenticating) return;
     if (isLockEnabled) {
-      _pausedAt = DateTime.now();
+      _pausedAt ??= DateTime.now();
     }
   }
 
@@ -188,10 +188,17 @@ class SecurityService extends ChangeNotifier {
 
     // Grace period: jika baru saja dibuka dalam 2 detik terakhir, jangan langsung kunci ulang
     if (_unlockedAt != null && DateTime.now().difference(_unlockedAt!).inSeconds < 2) {
+      _pausedAt = null;
       return;
     }
 
     if (_pausedAt == null) {
+      // Jika _pausedAt tidak tercatat namun aplikasi dibuka kembali,
+      // kunci jika aturan timeout adalah langsung saat keluar (0 detik)
+      if (timeoutSeconds == 0) {
+        _isLocked = true;
+        notifyListeners();
+      }
       return;
     }
 

@@ -76,7 +76,7 @@ class _SecurityGuardState extends State<SecurityGuard> with WidgetsBindingObserv
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.paused) {
+    if (state == AppLifecycleState.paused || state == AppLifecycleState.hidden) {
       _sec.onAppPaused();
     } else if (state == AppLifecycleState.resumed) {
       _sec.onAppResumed();
