@@ -55,48 +55,6 @@ class _KelolaKeamananPageState extends State<KelolaKeamananPage> {
     }
   }
 
-  Future<void> _changeTimeout() async {
-    final current = _sec.timeoutSeconds;
-    final selected = await showDialog<int>(
-      context: context,
-      builder: (ctx) => SimpleDialog(
-        title: const Text('Kunci Otomatis'),
-        children: [
-          ListTile(
-            title: const Text('Langsung'),
-            subtitle: const Text('Saat aplikasi keluar atau berpindah'),
-            trailing: current == 0 ? const Icon(Icons.check, color: Colors.teal) : null,
-            onTap: () => Navigator.pop(ctx, 0),
-          ),
-          ListTile(
-            title: const Text('Setelah 1 Menit'),
-            subtitle: const Text('Beri jeda 1 menit sebelum terkunci'),
-            trailing: current == 60 ? const Icon(Icons.check, color: Colors.teal) : null,
-            onTap: () => Navigator.pop(ctx, 60),
-          ),
-          ListTile(
-            title: const Text('Setelah 5 Menit'),
-            subtitle: const Text('Beri jeda 5 menit sebelum terkunci'),
-            trailing: current == 300 ? const Icon(Icons.check, color: Colors.teal) : null,
-            onTap: () => Navigator.pop(ctx, 300),
-          ),
-        ],
-      ),
-    );
-
-    if (selected != null && mounted) {
-      await _sec.setTimeoutSeconds(selected);
-      setState(() {});
-    }
-  }
-
-  String _timeoutLabel(int seconds) {
-    if (seconds == 0) return 'Langsung saat keluar';
-    if (seconds == 60) return 'Setelah 1 menit';
-    if (seconds == 300) return 'Setelah 5 menit';
-    return '${seconds ~/ 60} menit';
-  }
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -217,16 +175,6 @@ class _KelolaKeamananPageState extends State<KelolaKeamananPage> {
                         onChanged: _sec.hasBiometrics
                             ? (val) => _sec.setBiometricEnabled(val)
                             : null,
-                      ),
-                      Divider(height: 1, indent: 56, color: isDark ? Colors.white12 : Colors.black12),
-
-                      // Batas Waktu Kunci Otomatis
-                      ListTile(
-                        leading: const Icon(Icons.timer_outlined),
-                        title: const Text('Kunci Otomatis', style: TextStyle(fontWeight: FontWeight.w600)),
-                        subtitle: Text(_timeoutLabel(_sec.timeoutSeconds)),
-                        trailing: const Icon(Icons.chevron_right),
-                        onTap: _changeTimeout,
                       ),
                     ],
                   ),

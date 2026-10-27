@@ -16,8 +16,6 @@ class SecurityService extends ChangeNotifier {
   bool _isLocked = false;
   bool _hasBiometrics = false;
   bool _isAuthenticating = false;
-  DateTime? _pausedAt;
-  DateTime? _unlockedAt;
 
   // Keys
   static const _kEnabled = 'sec_lock_enabled';
@@ -156,8 +154,6 @@ class SecurityService extends ChangeNotifier {
   /// Buka kunci aplikasi
   void unlock() {
     _isLocked = false;
-    _pausedAt = null;
-    _unlockedAt = DateTime.now();
     notifyListeners();
   }
 
@@ -169,44 +165,18 @@ class SecurityService extends ChangeNotifier {
     }
   }
 
-  /// Dipanggil saat aplikasi masuk ke background
+  /// Dipanggil saat aplikasi masuk ke background.
+  /// Kunci aplikasi TIDAK dipicu saat minimasi/pindah app.
+  /// Kunci hanya terjadi saat cold start (app benar-benar ditutup/dihapus
+  /// dari riwayat aktifitas) yang ditangani oleh init().
   void onAppPaused() {
-    // Jangan catat waktu jeda jika sedang dalam proses dialog autentikasi biometrik
-    if (_isAuthenticating) return;
-    if (isLockEnabled) {
-      _pausedAt ??= DateTime.now();
-    }
+    // Tidak perlu mengunci — kunci hanya saat cold start via init().
   }
 
-  /// Dipanggil saat aplikasi kembali aktif (resumed)
+  /// Dipanggil saat aplikasi kembali aktif (resumed).
+  /// Tidak mengunci karena perilaku yang diinginkan: kunci hanya saat
+  /// app benar-benar di-close dari riwayat (cold start).
   void onAppResumed() {
-    if (!isLockEnabled) return;
-    if (_isLocked) return;
-
-    // Abaikan jika sedang dalam dialog autentikasi biometrik
-    if (_isAuthenticating) return;
-
-    // Grace period: jika baru saja dibuka dalam 2 detik terakhir, jangan langsung kunci ulang
-    if (_unlockedAt != null && DateTime.now().difference(_unlockedAt!).inSeconds < 2) {
-      _pausedAt = null;
-      return;
-    }
-
-    if (_pausedAt == null) {
-      // Jika _pausedAt tidak tercatat namun aplikasi dibuka kembali,
-      // kunci jika aturan timeout adalah langsung saat keluar (0 detik)
-      if (timeoutSeconds == 0) {
-        _isLocked = true;
-        notifyListeners();
-      }
-      return;
-    }
-
-    final diff = DateTime.now().difference(_pausedAt!).inSeconds;
-    if (diff >= timeoutSeconds) {
-      _isLocked = true;
-      notifyListeners();
-    }
-    _pausedAt = null;
+    // Tidak perlu mengunci — kunci hanya saat cold start via init().
   }
 }
