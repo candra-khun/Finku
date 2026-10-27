@@ -134,7 +134,7 @@ class SecurityService extends ChangeNotifier {
     _isAuthenticating = true;
     try {
       final success = await _localAuth.authenticate(
-        localizedReason: 'Pindai sidik jari Anda untuk membuka Keuangan Saku',
+        localizedReason: 'Pindai sidik jari Anda untuk membuka Finku',
         biometricOnly: true,
         persistAcrossBackgrounding: true,
       );

@@ -37,7 +37,7 @@ class BackupService {
   Future<Map<String, dynamic>> createBackupData() async {
     final db = await _d.db;
     return {
-      'app': 'keuangan_saku',
+      'app': 'finku',
       'version': 1,
       'created_at': DateTime.now().toIso8601String(),
       'asset_groups': await db.query('asset_groups'),
@@ -67,7 +67,7 @@ class BackupService {
     final dateStr = ymd(now).replaceAll('-', '');
     final timeStr =
         '${now.hour.toString().padLeft(2, '0')}${now.minute.toString().padLeft(2, '0')}';
-    final fileName = 'keuangan_saku_backup_${dateStr}_$timeStr.ksbackup';
+    final fileName = 'finku_backup_${dateStr}_$timeStr.ksbackup';
     final filePath = p.join(tempDir.path, fileName);
     final file = File(filePath);
     await file.writeAsString(jsonStr, encoding: utf8);
@@ -75,8 +75,8 @@ class BackupService {
     await SharePlus.instance.share(
       ShareParams(
         files: [XFile(filePath, mimeType: 'application/json', name: fileName)],
-        subject: 'Cadangan Data Keuangan Saku',
-        text: 'Berkas cadangan data Keuangan Saku ($fileName)',
+        subject: 'Cadangan Data Finku',
+        text: 'Berkas cadangan data Finku ($fileName)',
       ),
     );
     return filePath;
@@ -89,9 +89,9 @@ class BackupService {
       throw const FormatException(
           'Format berkas cadangan tidak valid (bukan JSON object).');
     }
-    if (decoded['app'] != 'keuangan_saku') {
+    if (decoded['app'] != 'finku' && decoded['app'] != 'keuangan_saku') {
       throw const FormatException(
-          'Berkas ini bukan berkas cadangan resmi Keuangan Saku.');
+          'Berkas ini bukan berkas cadangan resmi Finku.');
     }
     final createdAt =
         DateTime.tryParse(decoded['created_at']?.toString() ?? '') ??
@@ -130,9 +130,9 @@ class BackupService {
     if (decoded is! Map<String, dynamic>) {
       throw const FormatException('Format berkas cadangan tidak valid.');
     }
-    if (decoded['app'] != 'keuangan_saku') {
+    if (decoded['app'] != 'finku' && decoded['app'] != 'keuangan_saku') {
       throw const FormatException(
-          'Berkas ini bukan berkas cadangan Keuangan Saku.');
+          'Berkas ini bukan berkas cadangan Finku.');
     }
 
     final db = await _d.db;
@@ -288,8 +288,8 @@ class BackupService {
     await SharePlus.instance.share(
       ShareParams(
         files: [XFile(filePath, mimeType: 'text/csv', name: fileName)],
-        subject: 'Laporan Keuangan Saku (CSV/Excel)',
-        text: 'Laporan transaksi Keuangan Saku ($fileName)',
+        subject: 'Laporan Finku (CSV/Excel)',
+        text: 'Laporan transaksi Finku ($fileName)',
       ),
     );
 

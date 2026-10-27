@@ -31,7 +31,7 @@ class KeuanganApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Keuangan Saku',
+      title: 'Finku',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(colorSchemeSeed: _seed, useMaterial3: true),
       darkTheme: ThemeData(

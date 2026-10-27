@@ -89,7 +89,7 @@ class _LainnyaPageState extends State<LainnyaPage> {
   Future<void> _pasteAndRestore(BackupService service) async {
     final textCtrl = TextEditingController();
     final data = await Clipboard.getData(Clipboard.kTextPlain);
-    if (data?.text != null && data!.text!.contains('keuangan_saku')) {
+    if (data?.text != null && (data!.text!.contains('finku') || data.text!.contains('keuangan_saku'))) {
       textCtrl.text = data.text!;
     }
 
@@ -626,6 +626,42 @@ class _LainnyaPageState extends State<LainnyaPage> {
                           ),
                         ],
                       ),
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 28),
+
+              // Branding Footer Finku
+              Center(
+                child: Column(
+                  children: [
+                    Container(
+                      width: 52,
+                      height: 52,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.06),
+                            blurRadius: 10,
+                          ),
+                        ],
+                      ),
+                      clipBehavior: Clip.antiAlias,
+                      child: Image.asset('assets/images/logo.png', fit: BoxFit.contain),
+                    ),
+                    const SizedBox(height: 10),
+                    const Text(
+                      'Finku',
+                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      'Financial-ku • Manajer Keuangan v1.0.0',
+                      style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
                     ),
                   ],
                 ),
