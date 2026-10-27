@@ -234,14 +234,3 @@ flutter build apk --release
 - [`share_plus`](https://pub.dev/packages/share_plus) & [`file_picker`](https://pub.dev/packages/file_picker): Berbagi file dan pemilihan berkas cadangan
 
 ---
-
-<p align="center">
-  Dibuat dengan ❤️ untuk kemudahan pengelolaan finansial yang lebih tertata dan terencana.
-</p>
-
----
-
-<p align="center">
-  Dibuat dengan ❤️ untuk kemudahan pengelolaan finansial yang lebih tertata dan terencana.
-</p>
-
