@@ -39,7 +39,7 @@ class KeuanganApp extends StatelessWidget {
       builder: (context, _) {
         final langCode = AppSettings.instance.languageCode;
         return MaterialApp(
-          key: ValueKey('app_${langCode}_${AppSettings.instance.currency.code}'),
+          key: ValueKey('app_$langCode'),
           title: 'Finku',
           debugShowCheckedModeBanner: false,
           theme: ThemeData(colorSchemeSeed: _seed, useMaterial3: true),

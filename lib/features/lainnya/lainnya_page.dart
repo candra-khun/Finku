@@ -12,7 +12,6 @@ import '../anggaran/anggaran_page.dart';
 import '../kategori/kelola_kategori_page.dart';
 import '../keamanan/kelola_keamanan_page.dart';
 import '../master/master_bahasa_page.dart';
-import '../master/master_mata_uang_page.dart';
 import '../tag/kelola_tag_page.dart';
 import '../tagihan/tagihan_page.dart';
 import '../target/target_page.dart';
@@ -647,36 +646,11 @@ class _LainnyaPageState extends State<LainnyaPage> {
                         color: isDark ? Colors.white12 : Colors.black12),
                     ListTile(
                       leading: CircleAvatar(
-                        backgroundColor: Colors.amber.withValues(alpha: 0.15),
-                        child: const Icon(Icons.payments_outlined,
-                            color: Colors.amber),
-                      ),
-                      title: Text('Mata Uang'.tr,
-                          style: const TextStyle(fontWeight: FontWeight.w600)),
-                      subtitle: Text(
-                        '${AppSettings.instance.currency.name} (${AppSettings.instance.currency.symbol})',
-                      ),
-                      trailing: const Icon(Icons.chevron_right),
-                      onTap: () async {
-                        await Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (_) => const MasterMataUangPage()),
-                        );
-                        setState(() {});
-                      },
-                    ),
-                    Divider(
-                        height: 1,
-                        indent: 64,
-                        color: isDark ? Colors.white12 : Colors.black12),
-                    ListTile(
-                      leading: CircleAvatar(
                         backgroundColor: Colors.blue.withValues(alpha: 0.15),
                         child: const Icon(Icons.translate_outlined,
                             color: Colors.blue),
                       ),
-                      title: Text('Bahasa'.tr,
+                      title: Text('Master Bahasa'.tr,
                           style: const TextStyle(fontWeight: FontWeight.w600)),
                       subtitle: Text(
                         '${AppSettings.instance.currentLanguage.flag} ${AppSettings.instance.currentLanguage.name}',

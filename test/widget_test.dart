@@ -128,29 +128,12 @@ void main() {
     expect(goalOverdue.daysRemaining! < 0, true);
   });
 
-  test('master bahasa dan mata uang', () async {
+  test('master bahasa dan format mata uang rupiah', () async {
     final settings = AppSettings.instance;
-    // Default currency IDR
+    // Default currency IDR (Rupiah Indonesia)
     expect(settings.currency.code, 'IDR');
     expect(settings.formatMoney(1500000), 'Rp 1.500.000');
     expect(settings.formatMoney(-2500), '-Rp 2.500');
-
-    // Test ganti mata uang ke USD
-    const usd = CurrencyModel(
-      code: 'USD',
-      name: 'US Dollar',
-      symbol: '\$',
-      isPrefix: true,
-      thousandSep: ',',
-      decimalSep: '.',
-    );
-    settings.setCurrency(usd);
-    expect(settings.formatMoney(1500000), '\$ 1,500,000');
-    expect(settings.formatMoney(-2500), '-\$ 2,500');
-
-    // Kembalikan ke default IDR
-    settings.setCurrency(AppSettings.defaultCurrencies.first);
-    expect(settings.formatMoney(1500000), 'Rp 1.500.000');
 
     // Test ganti bahasa & lokalisasi
     await settings.setLanguage('id');
