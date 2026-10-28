@@ -32,6 +32,7 @@ Future<void> main() async {
 }
 
 class KeuanganApp extends StatelessWidget {
+  static final ValueNotifier<bool> splashComplete = ValueNotifier<bool>(false);
   static bool hasShownSplash = false;
 
   const KeuanganApp({super.key});
@@ -106,12 +107,17 @@ class _SecurityGuardState extends State<SecurityGuard> with WidgetsBindingObserv
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
-      listenable: _sec,
+      listenable: Listenable.merge([_sec, KeuanganApp.splashComplete]),
       builder: (context, _) {
+        // Layar kunci (PIN / Sidik Jari) hanya ditampilkan setelah splash screen selesai
+        final showLock = KeuanganApp.splashComplete.value &&
+            _sec.isLockEnabled &&
+            _sec.isLocked;
+
         return Stack(
           children: [
             widget.child,
-            if (_sec.isLockEnabled && _sec.isLocked)
+            if (showLock)
               const Positioned.fill(
                 child: LockScreen(),
               ),

@@ -12,7 +12,8 @@ class SplashScreen extends StatefulWidget {
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderStateMixin {
+class _SplashScreenState extends State<SplashScreen>
+    with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
   late final Animation<double> _fadeAnimation;
   late final Animation<double> _scaleAnimation;
@@ -40,13 +41,16 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
 
     _controller.forward();
 
-    // Splash screen sebentar tepat 1 detik (1000ms) agar cepat dan tidak mengganggu
+    // Splash screen tepat 1 detik (1000ms) agar cepat dan tidak mengganggu
     _timer = Timer(const Duration(milliseconds: 1000), _navigateToHome);
   }
 
   void _navigateToHome() {
     if (!mounted) return;
+    // Tandai splash sudah selesai agar SecurityGuard boleh tampilkan lock screen
     KeuanganApp.hasShownSplash = true;
+    KeuanganApp.splashComplete.value = true;
+
     Navigator.of(context).pushReplacement(
       PageRouteBuilder(
         pageBuilder: (context, animation, secondaryAnimation) =>
@@ -88,11 +92,14 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                   width: 92,
                   height: 92,
                   decoration: BoxDecoration(
-                    color: isDark ? const Color(0xFF23272F) : const Color(0xFFF0FDF4),
+                    color: isDark
+                        ? const Color(0xFF23272F)
+                        : const Color(0xFFF0FDF4),
                     borderRadius: BorderRadius.circular(24),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withValues(alpha: isDark ? 0.35 : 0.08),
+                        color: Colors.black
+                            .withValues(alpha: isDark ? 0.35 : 0.08),
                         blurRadius: 20,
                         offset: const Offset(0, 8),
                       ),
