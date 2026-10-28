@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -60,6 +62,14 @@ class _WidgetPreviewPageState extends State<WidgetPreviewPage> {
     }
   }
 
+  Future<List<Totals>> _loadMonthlyTrend(Repo repo, DateTime now) async {
+    final totalsByMonth = await repo.monthlyTotals(now.year);
+    return List.generate(
+      12,
+      (index) => totalsByMonth[index + 1] ?? const Totals(0, 0),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final repo = context.watch<Repo>();
@@ -83,23 +93,25 @@ class _WidgetPreviewPageState extends State<WidgetPreviewPage> {
           ),
         ],
       ),
-      body: FutureBuilder<(Totals, List<AssetGroup>, List<AssetBalance>, List<TxItem>)>(
+      body: FutureBuilder<
+          (Totals, List<AssetGroup>, List<AssetBalance>, List<Totals>)>(
         future: Future.wait([
           repo.totals(firstOfMonth(now), lastOfMonth(now)),
           repo.groups(),
           repo.assetBalances(),
-          repo.recentTransactions(limit: 3),
+          _loadMonthlyTrend(repo, now),
         ]).then((res) => (
               res[0] as Totals,
               res[1] as List<AssetGroup>,
               res[2] as List<AssetBalance>,
-              res[3] as List<TxItem>,
+              res[3] as List<Totals>,
             )),
         builder: (context, snapshot) {
           final totals = snapshot.data?.$1 ?? const Totals(0, 0);
           final groups = snapshot.data?.$2 ?? <AssetGroup>[];
           final balances = snapshot.data?.$3 ?? <AssetBalance>[];
-          final recentTxs = snapshot.data?.$4 ?? <TxItem>[];
+          final monthlyTrend =
+              snapshot.data?.$4 ?? List<Totals>.filled(6, const Totals(0, 0));
 
           final monthLabel = periodLabel(periodOf(now));
           final netBalance = totals.income - totals.expense;
@@ -112,7 +124,9 @@ class _WidgetPreviewPageState extends State<WidgetPreviewPage> {
               Container(
                 padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
-                  color: isDark ? const Color(0xFF1E2824) : const Color(0xFFE6F4EA),
+                  color: isDark
+                      ? const Color(0xFF1E2824)
+                      : const Color(0xFFE6F4EA),
                   borderRadius: BorderRadius.circular(14),
                   border: Border.all(
                     color: const Color(0xFF2E7D6B).withValues(alpha: 0.3),
@@ -120,7 +134,8 @@ class _WidgetPreviewPageState extends State<WidgetPreviewPage> {
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.widgets_outlined, color: Color(0xFF2E7D6B), size: 28),
+                    const Icon(Icons.widgets_outlined,
+                        color: Color(0xFF2E7D6B), size: 28),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Column(
@@ -128,7 +143,8 @@ class _WidgetPreviewPageState extends State<WidgetPreviewPage> {
                         children: [
                           Text(
                             'Tersedia di Layar Beranda HP'.tr,
-                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                            style: const TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 14),
                           ),
                           const SizedBox(height: 2),
                           Text(
@@ -136,7 +152,9 @@ class _WidgetPreviewPageState extends State<WidgetPreviewPage> {
                                 .tr,
                             style: TextStyle(
                               fontSize: 12,
-                              color: isDark ? Colors.grey.shade400 : Colors.black87,
+                              color: isDark
+                                  ? Colors.grey.shade400
+                                  : Colors.black87,
                             ),
                           ),
                         ],
@@ -154,7 +172,8 @@ class _WidgetPreviewPageState extends State<WidgetPreviewPage> {
                 children: [
                   Text(
                     'Widget kecil (2x2)'.tr,
-                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                        fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                   TextButton.icon(
                     onPressed: _toggleHideBalance,
@@ -163,7 +182,9 @@ class _WidgetPreviewPageState extends State<WidgetPreviewPage> {
                       size: 16,
                     ),
                     label: Text(
-                      _hideBalance ? 'Tampilkan Saldo'.tr : 'Sembunyikan Saldo'.tr,
+                      _hideBalance
+                          ? 'Tampilkan Saldo'.tr
+                          : 'Sembunyikan Saldo'.tr,
                       style: const TextStyle(fontSize: 12),
                     ),
                   ),
@@ -190,7 +211,8 @@ class _WidgetPreviewPageState extends State<WidgetPreviewPage> {
               // Title Widget Besar
               Text(
                 'Widget besar (4x3)'.tr,
-                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                style:
+                    const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 10),
 
@@ -199,7 +221,7 @@ class _WidgetPreviewPageState extends State<WidgetPreviewPage> {
                 totalAsset: totalAsset,
                 groups: groups,
                 balances: balances,
-                recentTxs: recentTxs,
+                monthlyTrend: monthlyTrend,
                 isHidden: _hideBalance,
               ),
 
@@ -222,20 +244,25 @@ class _WidgetPreviewPageState extends State<WidgetPreviewPage> {
                     children: [
                       Row(
                         children: [
-                          const Icon(Icons.help_outline, color: Color(0xFF2E7D6B), size: 20),
+                          const Icon(Icons.help_outline,
+                              color: Color(0xFF2E7D6B), size: 20),
                           const SizedBox(width: 8),
                           Text(
                             'Cara Memasang di HP Android'.tr,
-                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                            style: const TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 15),
                           ),
                         ],
                       ),
                       const SizedBox(height: 12),
                       _stepItem(1, 'Buka Layar Beranda (Home Screen) HP Anda.'),
-                      _stepItem(2, 'Tekan dan tahan (long-press) bagian layar yang kosong.'),
-                      _stepItem(3, 'Ketuk menu "Widget" atau ikon plus (+) di layar.'),
+                      _stepItem(2,
+                          'Tekan dan tahan (long-press) bagian layar yang kosong.'),
+                      _stepItem(3,
+                          'Ketuk menu "Widget" atau ikon plus (+) di layar.'),
                       _stepItem(4, 'Gulir ke bawah dan cari aplikasi "Finku".'),
-                      _stepItem(5, 'Pilih "Widget Kecil (2x2)" atau "Widget Besar (4x3)", lalu geser ke layar Anda.'),
+                      _stepItem(5,
+                          'Pilih "Widget Kecil (2x2)" atau "Widget Besar (4x3)", lalu geser ke layar Anda.'),
                     ],
                   ),
                 ),
@@ -363,7 +390,8 @@ class _WidgetPreviewPageState extends State<WidgetPreviewPage> {
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(Icons.arrow_downward, color: Color(0xFF29B6F6), size: 12),
+                  const Icon(Icons.arrow_downward,
+                      color: Color(0xFF29B6F6), size: 12),
                   const SizedBox(width: 3),
                   Text(
                     isHidden ? '••••' : ringkas(income),
@@ -379,7 +407,8 @@ class _WidgetPreviewPageState extends State<WidgetPreviewPage> {
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(Icons.arrow_upward, color: Color(0xFFFF5C5C), size: 12),
+                  const Icon(Icons.arrow_upward,
+                      color: Color(0xFFFF5C5C), size: 12),
                   const SizedBox(width: 3),
                   Text(
                     isHidden ? '••••' : ringkas(expense),
@@ -415,7 +444,8 @@ class _WidgetPreviewPageState extends State<WidgetPreviewPage> {
                       child: const Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.arrow_upward, color: Color(0xFFFF6B6B), size: 13),
+                          Icon(Icons.arrow_upward,
+                              color: Color(0xFFFF6B6B), size: 13),
                           SizedBox(width: 4),
                           Text(
                             'Keluar',
@@ -450,7 +480,8 @@ class _WidgetPreviewPageState extends State<WidgetPreviewPage> {
                       child: const Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.arrow_downward, color: Color(0xFF38BDF8), size: 13),
+                          Icon(Icons.arrow_downward,
+                              color: Color(0xFF38BDF8), size: 13),
                           SizedBox(width: 4),
                           Text(
                             'Masuk',
@@ -477,7 +508,7 @@ class _WidgetPreviewPageState extends State<WidgetPreviewPage> {
     required int totalAsset,
     required List<AssetGroup> groups,
     required List<AssetBalance> balances,
-    required List<TxItem> recentTxs,
+    required List<Totals> monthlyTrend,
     required bool isHidden,
   }) {
     return Container(
@@ -549,7 +580,8 @@ class _WidgetPreviewPageState extends State<WidgetPreviewPage> {
                     width: 38,
                     height: 38,
                     alignment: Alignment.center,
-                    child: const Icon(Icons.add, color: Color(0xFF38BDF8), size: 20),
+                    child: const Icon(Icons.add,
+                        color: Color(0xFF38BDF8), size: 20),
                   ),
                 ),
               ),
@@ -560,7 +592,8 @@ class _WidgetPreviewPageState extends State<WidgetPreviewPage> {
           // 3 Kelompok Aset
           Row(
             children: List.generate(3, (index) {
-              final groupName = index < groups.length ? groups[index].name : '-';
+              final groupName =
+                  index < groups.length ? groups[index].name : '-';
               final groupBal = index < groups.length
                   ? balances
                       .where((b) => b.asset.groupId == groups[index].id)
@@ -573,7 +606,8 @@ class _WidgetPreviewPageState extends State<WidgetPreviewPage> {
                     left: index == 0 ? 0 : 5,
                     right: index == 2 ? 0 : 5,
                   ),
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
                   decoration: BoxDecoration(
                     color: const Color(0xFF232832),
                     borderRadius: BorderRadius.circular(12),
@@ -610,85 +644,167 @@ class _WidgetPreviewPageState extends State<WidgetPreviewPage> {
           const Divider(color: Color(0xFF282E3A), height: 1),
           const SizedBox(height: 14),
 
-          // Section Transaksi Terbaru
+          // Tren bulanan mengikuti tampilan Statistik > Tren Bulanan.
           const Text(
-            'Transaksi terbaru',
+            'Grafik Tren Jan - Des',
             style: TextStyle(
               color: Color(0xFF9E9E9E),
               fontSize: 12,
-              fontWeight: FontWeight.w500,
+              fontWeight: FontWeight.w600,
             ),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 8),
+          const Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              _WidgetTrendLegend(color: Colors.green, label: 'Masuk'),
+              SizedBox(width: 10),
+              _WidgetTrendLegend(color: Colors.redAccent, label: 'Keluar'),
+            ],
+          ),
+          const SizedBox(height: 8),
+          SizedBox(
+            height: 138,
+            child: _buildMonthlyTrendChart(monthlyTrend, isHidden),
+          ),
+        ],
+      ),
+    );
+  }
 
-          if (recentTxs.isEmpty)
-            const Padding(
-              padding: EdgeInsets.symmetric(vertical: 12),
-              child: Center(
-                child: Text(
-                  'Belum ada transaksi',
-                  style: TextStyle(color: Color(0xFF757575), fontSize: 12),
+  Widget _buildMonthlyTrendChart(List<Totals> monthlyTrend, bool isHidden) {
+    if (isHidden) {
+      return const Center(
+        child: Text(
+          '••••••••',
+          style: TextStyle(
+            color: Color(0xFF757575),
+            fontSize: 18,
+            letterSpacing: 2,
+          ),
+        ),
+      );
+    }
+
+    final maxValue = monthlyTrend.fold<int>(0, (currentMax, totals) {
+      return math.max(currentMax, math.max(totals.income, totals.expense));
+    });
+    final effectiveMax = maxValue > 0 ? maxValue * 1.15 : 1;
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        const labelsHeight = 20.0;
+        final chartHeight = constraints.maxHeight - labelsHeight;
+        return Column(
+          children: [
+            SizedBox(
+              height: chartHeight,
+              child: Stack(
+                children: [
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: List.generate(
+                      4,
+                      (_) => const Divider(height: 1, color: Color(0xFF343B47)),
+                    ),
+                  ),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: List.generate(12, (index) {
+                      final totals = monthlyTrend[index];
+                      final incomeHeight = math.max(
+                        totals.income / effectiveMax * chartHeight,
+                        totals.income > 0 ? 2.0 : 0.0,
+                      );
+                      final expenseHeight = math.max(
+                        totals.expense / effectiveMax * chartHeight,
+                        totals.expense > 0 ? 2.0 : 0.0,
+                      );
+                      return Expanded(
+                        child: Align(
+                          alignment: Alignment.bottomCenter,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              _TrendBar(
+                                  height: incomeHeight, color: Colors.green),
+                              const SizedBox(width: 2),
+                              _TrendBar(
+                                  height: expenseHeight,
+                                  color: Colors.redAccent),
+                            ],
+                          ),
+                        ),
+                      );
+                    }),
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(
+              height: labelsHeight,
+              child: Row(
+                children: List.generate(
+                  12,
+                  (index) => Expanded(
+                    child: Center(
+                      child: Text(
+                        bulanPendek[index],
+                        style: const TextStyle(
+                            color: Color(0xFF8E95A2), fontSize: 8),
+                      ),
+                    ),
+                  ),
                 ),
               ),
-            )
-          else
-            ...recentTxs.take(3).map((tx) {
-              final cat = tx.categoryName ?? (tx.type == 'transfer' ? 'Transfer' : 'Lainnya');
-              final isIncome = tx.type == 'income';
-              final String sign;
-              if (tx.type == 'income') {
-                sign = '+';
-              } else if (tx.type == 'expense') {
-                sign = '-';
-              } else {
-                sign = '';
-              }
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
 
-              return Padding(
-                padding: const EdgeInsets.only(bottom: 9),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: RichText(
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        text: TextSpan(
-                          children: [
-                            TextSpan(
-                              text: cat,
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 13,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            TextSpan(
-                              text: ' · ${tx.assetName}',
-                              style: const TextStyle(
-                                color: Color(0xFF9E9E9E),
-                                fontSize: 12,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      isHidden ? '••••••••' : '$sign${rupiah(tx.amount)}',
-                      style: TextStyle(
-                        color: isIncome ? const Color(0xFF29B6F6) : const Color(0xFFFF5C5C),
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            }),
-        ],
+class _TrendBar extends StatelessWidget {
+  final double height;
+  final Color color;
+
+  const _TrendBar({required this.height, required this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 5,
+      height: height,
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.85),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(3)),
       ),
     );
   }
 }
 
+class _WidgetTrendLegend extends StatelessWidget {
+  final Color color;
+  final String label;
+
+  const _WidgetTrendLegend({required this.color, required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: 7,
+          height: 7,
+          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+        ),
+        const SizedBox(width: 4),
+        Text(label,
+            style: const TextStyle(color: Color(0xFF9E9E9E), fontSize: 10)),
+      ],
+    );
+  }
+}

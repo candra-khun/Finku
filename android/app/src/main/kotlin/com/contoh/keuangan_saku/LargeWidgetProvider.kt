@@ -4,9 +4,12 @@ import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.Canvas
 import android.graphics.Color
-import android.view.View
+import android.graphics.Paint
 import android.widget.RemoteViews
+import kotlin.math.max
 
 class LargeWidgetProvider : AppWidgetProvider() {
 
@@ -65,10 +68,8 @@ class LargeWidgetProvider : AppWidgetProvider() {
                 views.setTextViewText(R.id.tv_large_group3_name, g3Name)
                 views.setTextViewText(R.id.tv_large_group3_val, WidgetHelper.formatMaskedCompact(g3Val, isHidden))
 
-                // 3 Transaksi Terbaru
-                bindTransactionRow(views, prefs, isHidden, 1, R.id.row_tx_1, R.id.tv_large_tx1_title, R.id.tv_large_tx1_amount)
-                bindTransactionRow(views, prefs, isHidden, 2, R.id.row_tx_2, R.id.tv_large_tx2_title, R.id.tv_large_tx2_amount)
-                bindTransactionRow(views, prefs, isHidden, 3, R.id.row_tx_3, R.id.tv_large_tx3_title, R.id.tv_large_tx3_amount)
+                // Tren bulanan Jan–Des, sama seperti menu Statistik.
+                bindMonthlyTrend(views, prefs, isHidden)
 
                 // Klik bodi membuka aplikasi
                 val openAppIntent = WidgetHelper.getOpenAppPendingIntent(context, null, 300)
@@ -80,27 +81,89 @@ class LargeWidgetProvider : AppWidgetProvider() {
             }
         }
 
-        private fun bindTransactionRow(
+        private fun bindMonthlyTrend(
             views: RemoteViews,
             prefs: android.content.SharedPreferences,
-            isHidden: Boolean,
-            index: Int,
-            rowId: Int,
-            titleId: Int,
-            amountId: Int
+            isHidden: Boolean
         ) {
-            val title = prefs.getString("${WidgetHelper.KEY_PREFIX}widget_tx${index}_title", null)
-            val amount = prefs.getString("${WidgetHelper.KEY_PREFIX}widget_tx${index}_amount", null)
-            val isIncome = prefs.getBoolean("${WidgetHelper.KEY_PREFIX}widget_tx${index}_is_income", false)
+            val labels = prefs.getString("${WidgetHelper.KEY_PREFIX}widget_trend_months", "")
+                ?.split('|')
+                ?.filter { it.isNotBlank() }
+                .orEmpty()
+            val income = prefs.getString("${WidgetHelper.KEY_PREFIX}widget_trend_income", "")
+                ?.split('|')
+                ?.map { it.toLongOrNull() ?: 0L }
+                .orEmpty()
+            val expense = prefs.getString("${WidgetHelper.KEY_PREFIX}widget_trend_expense", "")
+                ?.split('|')
+                ?.map { it.toLongOrNull() ?: 0L }
+                .orEmpty()
 
-            if (title.isNullOrEmpty() || amount.isNullOrEmpty()) {
-                views.setViewVisibility(rowId, View.GONE)
-            } else {
-                views.setViewVisibility(rowId, View.VISIBLE)
-                views.setTextViewText(titleId, title)
-                views.setTextViewText(amountId, WidgetHelper.formatMasked(amount, isHidden))
-                views.setTextColor(amountId, if (isIncome) Color.parseColor("#29B6F6") else Color.parseColor("#FF5C5C"))
+            if (isHidden) {
+                views.setImageViewBitmap(R.id.img_large_trend_chart, null)
+                views.setTextViewText(R.id.tv_large_trend_labels, "••••••••")
+                return
             }
+
+            views.setImageViewBitmap(R.id.img_large_trend_chart, createTrendChart(income, expense))
+            views.setTextViewText(R.id.tv_large_trend_labels, labels.joinToString(" "))
+        }
+
+        private fun createTrendChart(income: List<Long>, expense: List<Long>): Bitmap {
+            val width = 600
+            val height = 140
+            val bottom = height - 3f
+            val chartHeight = height - 12f
+            val maxValue = max(
+                1L,
+                max(income.maxOrNull() ?: 0L, expense.maxOrNull() ?: 0L)
+            ).toFloat() * 1.15f
+            val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+            val canvas = Canvas(bitmap)
+            val gridPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                color = Color.parseColor("#343B47")
+                strokeWidth = 1f
+            }
+            val incomePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                color = Color.parseColor("#43A047")
+            }
+            val expensePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                color = Color.parseColor("#FF5252")
+            }
+
+            for (index in 0..3) {
+                val y = 4f + (chartHeight / 3f * index)
+                canvas.drawLine(0f, y, width.toFloat(), y, gridPaint)
+            }
+
+            val slotWidth = width / 12f
+            val barWidth = 9f
+            for (index in 0 until 12) {
+                val incomeValue = income.getOrElse(index) { 0L }
+                val expenseValue = expense.getOrElse(index) { 0L }
+                val incomeHeight = if (incomeValue == 0L) 0f else max(2f, incomeValue / maxValue * chartHeight)
+                val expenseHeight = if (expenseValue == 0L) 0f else max(2f, expenseValue / maxValue * chartHeight)
+                val center = slotWidth * index + slotWidth / 2f
+                canvas.drawRoundRect(
+                    center - barWidth - 2f,
+                    bottom - incomeHeight,
+                    center - 2f,
+                    bottom,
+                    3f,
+                    3f,
+                    incomePaint
+                )
+                canvas.drawRoundRect(
+                    center + 2f,
+                    bottom - expenseHeight,
+                    center + barWidth + 2f,
+                    bottom,
+                    3f,
+                    3f,
+                    expensePaint
+                )
+            }
+            return bitmap
         }
     }
 }

@@ -199,113 +199,54 @@
         android:layout_marginBottom="12dp"
         android:background="#272C36" />
 
-    <!-- Judul Transaksi Terbaru -->
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Transaksi terbaru"
-        android:textColor="#8E95A2"
-        android:textSize="12sp"
-        android:textStyle="bold" />
-
-    <!-- Daftar 3 Transaksi Terakhir -->
+    <!-- Tren bulanan Jan–Des, mengikuti menu Statistik -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="6dp"
-        android:orientation="vertical">
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
 
-        <!-- Baris Transaksi 1 -->
-        <RelativeLayout
-            android:id="@+id/row_tx_1"
-            android:layout_width="match_parent"
+        <TextView
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:paddingTop="4dp"
-            android:paddingBottom="4dp">
+            android:layout_weight="1"
+            android:text="Grafik Tren Jan - Des"
+            android:textColor="#E6EAF0"
+            android:textSize="12sp"
+            android:textStyle="bold" />
 
-            <TextView
-                android:id="@+id/tv_large_tx1_title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
-                android:layout_toStartOf="@+id/tv_large_tx1_amount"
-                android:ellipsize="end"
-                android:maxLines="1"
-                android:text="Makanan · Dompet"
-                android:textColor="#E6EAF0"
-                android:textSize="13sp" />
-
-            <TextView
-                android:id="@+id/tv_large_tx1_amount"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:text="-Rp 35.000"
-                android:textColor="#FF5C5C"
-                android:textSize="13sp"
-                android:textStyle="bold" />
-        </RelativeLayout>
-
-        <!-- Baris Transaksi 2 -->
-        <RelativeLayout
-            android:id="@+id/row_tx_2"
-            android:layout_width="match_parent"
+        <TextView
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingTop="4dp"
-            android:paddingBottom="4dp">
+            android:text="● Masuk"
+            android:textColor="#43A047"
+            android:textSize="9sp" />
 
-            <TextView
-                android:id="@+id/tv_large_tx2_title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
-                android:layout_toStartOf="@+id/tv_large_tx2_amount"
-                android:ellipsize="end"
-                android:maxLines="1"
-                android:text="Transportasi · Kartu"
-                android:textColor="#E6EAF0"
-                android:textSize="13sp" />
-
-            <TextView
-                android:id="@+id/tv_large_tx2_amount"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:text="-Rp 20.000"
-                android:textColor="#FF5C5C"
-                android:textSize="13sp"
-                android:textStyle="bold" />
-        </RelativeLayout>
-
-        <!-- Baris Transaksi 3 -->
-        <RelativeLayout
-            android:id="@+id/row_tx_3"
-            android:layout_width="match_parent"
+        <TextView
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingTop="4dp"
-            android:paddingBottom="4dp">
-
-            <TextView
-                android:id="@+id/tv_large_tx3_title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
-                android:layout_toStartOf="@+id/tv_large_tx3_amount"
-                android:ellipsize="end"
-                android:maxLines="1"
-                android:text="Gaji · Bank"
-                android:textColor="#E6EAF0"
-                android:textSize="13sp" />
-
-            <TextView
-                android:id="@+id/tv_large_tx3_amount"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:text="+Rp 8.500.000"
-                android:textColor="#29B6F6"
-                android:textSize="13sp"
-                android:textStyle="bold" />
-        </RelativeLayout>
+            android:layout_marginStart="8dp"
+            android:text="● Keluar"
+            android:textColor="#FF5252"
+            android:textSize="9sp" />
     </LinearLayout>
+
+    <ImageView
+        android:id="@+id/img_large_trend_chart"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:layout_marginTop="8dp"
+        android:contentDescription="Grafik tren bulanan"
+        android:scaleType="fitXY" />
+
+    <TextView
+        android:id="@+id/tv_large_trend_labels"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:fontFamily="monospace"
+        android:gravity="center"
+        android:text="Jan Feb Mar Apr Mei Jun Jul Agu Sep Okt Nov Des"
+        android:textColor="#8E95A2"
+        android:textSize="10sp" />
 </LinearLayout>
