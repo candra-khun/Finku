@@ -15,10 +15,15 @@ Future<void> openTxForm(
   BuildContext context, {
   TxItem? edit,
   TxItem? duplicate,
+  String? initialType,
 }) {
   return Navigator.of(context).push(
     MaterialPageRoute(
-      builder: (_) => TxFormPage(edit: edit, duplicate: duplicate),
+      builder: (_) => TxFormPage(
+        edit: edit,
+        duplicate: duplicate,
+        initialType: initialType,
+      ),
     ),
   );
 }
@@ -26,8 +31,9 @@ Future<void> openTxForm(
 class TxFormPage extends StatefulWidget {
   final TxItem? edit;
   final TxItem? duplicate;
+  final String? initialType;
 
-  const TxFormPage({super.key, this.edit, this.duplicate});
+  const TxFormPage({super.key, this.edit, this.duplicate, this.initialType});
 
   @override
   State<TxFormPage> createState() => _TxFormPageState();
@@ -58,6 +64,9 @@ class _TxFormPageState extends State<TxFormPage> {
   @override
   void initState() {
     super.initState();
+    if (widget.initialType != null) {
+      _type = widget.initialType!;
+    }
     final e = widget.edit ?? widget.duplicate;
     if (e != null) {
       _type = e.type;

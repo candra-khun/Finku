@@ -197,6 +197,31 @@ class AppStrings {
     'Ubah nama (koreksi salah ketik) atau hapus tag':
         'Ubah nama (koreksi salah ketik) atau hapus tag',
 
+    // Widget Layar Utama
+    'Widget Layar Utama': 'Widget Layar Utama',
+    'Widget kecil (2x2) dan besar (4x3) di Home Screen':
+        'Widget kecil (2x2) dan besar (4x3) di Home Screen',
+    'Widget kecil (2x2)': 'Widget kecil (2x2)',
+    'Widget besar (4x3)': 'Widget besar (4x3)',
+    'Tersedia di Layar Beranda HP': 'Tersedia di Layar Beranda HP',
+    'Catat transaksi tanpa buka aplikasi & pantau saldo langsung dari Home Screen.':
+        'Catat transaksi tanpa buka aplikasi & pantau saldo langsung dari Home Screen.',
+    'Sinkronkan Widget': 'Sinkronkan Widget',
+    'Data widget berhasil disinkronkan!': 'Data widget berhasil disinkronkan!',
+    'Tampilkan Saldo': 'Tampilkan Saldo',
+    'Sembunyikan Saldo': 'Sembunyikan Saldo',
+    'Cara Memasang di HP Android': 'Cara Memasang di HP Android',
+    'Buka Layar Beranda (Home Screen) HP Anda.':
+        'Buka Layar Beranda (Home Screen) HP Anda.',
+    'Tekan dan tahan (long-press) bagian layar yang kosong.':
+        'Tekan dan tahan (long-press) bagian layar yang kosong.',
+    'Ketuk menu "Widget" atau ikon plus (+) di layar.':
+        'Ketuk menu "Widget" atau ikon plus (+) di layar.',
+    'Gulir ke bawah dan cari aplikasi "Finku".':
+        'Gulir ke bawah dan cari aplikasi "Finku".',
+    'Pilih "Widget Kecil (2x2)" atau "Widget Besar (4x3)", lalu geser ke layar Anda.':
+        'Pilih "Widget Kecil (2x2)" atau "Widget Besar (4x3)", lalu geser ke layar Anda.',
+
     // Master Bahasa & Mata Uang
     'Bahasa Aplikasi Saat Ini': 'Bahasa Aplikasi Saat Ini',
     'PILIHAN BAHASA': 'PILIHAN BAHASA',
@@ -466,6 +491,31 @@ class AppStrings {
         'Edit names, colors, delete, and reorder categories',
     'Ubah nama (koreksi salah ketik) atau hapus tag':
         'Edit names (fix typos) or delete tags',
+
+    // Widget Layar Utama
+    'Widget Layar Utama': 'Home Screen Widgets',
+    'Widget kecil (2x2) dan besar (4x3) di Home Screen':
+        'Small (2x2) and large (4x3) widgets for your Home Screen',
+    'Widget kecil (2x2)': 'Small Widget (2x2)',
+    'Widget besar (4x3)': 'Large Widget (4x3)',
+    'Tersedia di Layar Beranda HP': 'Available on Phone Home Screen',
+    'Catat transaksi tanpa buka aplikasi & pantau saldo langsung dari Home Screen.':
+        'Log transactions effortlessly & monitor balance right from your Home Screen.',
+    'Sinkronkan Widget': 'Sync Widget',
+    'Data widget berhasil disinkronkan!': 'Widget data successfully synced!',
+    'Tampilkan Saldo': 'Show Balance',
+    'Sembunyikan Saldo': 'Hide Balance',
+    'Cara Memasang di HP Android': 'How to Add to Android Home Screen',
+    'Buka Layar Beranda (Home Screen) HP Anda.':
+        'Go to your phone\'s Home Screen.',
+    'Tekan dan tahan (long-press) bagian layar yang kosong.':
+        'Touch and hold an empty space on the screen.',
+    'Ketuk menu "Widget" atau ikon plus (+) di layar.':
+        'Tap "Widgets" or the plus (+) icon.',
+    'Gulir ke bawah dan cari aplikasi "Finku".':
+        'Scroll down and find the "Finku" app.',
+    'Pilih "Widget Kecil (2x2)" atau "Widget Besar (4x3)", lalu geser ke layar Anda.':
+        'Choose "Small Widget (2x2)" or "Large Widget (4x3)", then drag it to your screen.',
 
     // Master Bahasa & Mata Uang
     'Bahasa Aplikasi Saat Ini': 'Current App Language',

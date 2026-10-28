@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart' hide Category;
 import 'package:sqflite/sqflite.dart';
 
 import '../core/format.dart';
+import '../core/widget_service.dart';
 import 'database.dart';
 import 'models.dart';
 
@@ -19,8 +20,15 @@ class ClosedPeriodException implements Exception {
 class Repo extends ChangeNotifier {
   final AppDb _d = AppDb.instance;
 
-  void _changed() => notifyListeners();
-  void notifyChanged() => notifyListeners();
+  void _changed() {
+    notifyListeners();
+    WidgetService.updateWidgets(this);
+  }
+
+  void notifyChanged() {
+    notifyListeners();
+    WidgetService.updateWidgets(this);
+  }
 
   // ---------------------------------------------------------------- master
 
@@ -401,6 +409,21 @@ class Repo extends ChangeNotifier {
     return rows
         .map((r) => TxItem.fromMap(r, tagsByTx[r['id'] as int] ?? const []))
         .toList();
+  }
+
+  /// Mengambil sejumlah transaksi terakhir (untuk widget dan ringkasan cepat).
+  Future<List<TxItem>> recentTransactions({int limit = 5}) async {
+    final db = await _d.db;
+    final rows = await db.rawQuery('''
+      SELECT t.*, c.name AS cat_name, a.name AS asset_name, a2.name AS to_asset_name
+      FROM transactions t
+      LEFT JOIN categories c ON c.id = t.category_id
+      JOIN assets a ON a.id = t.asset_id
+      LEFT JOIN assets a2 ON a2.id = t.to_asset_id
+      ORDER BY t.date DESC, t.id DESC
+      LIMIT ?
+    ''', [limit]);
+    return rows.map((r) => TxItem.fromMap(r, const [])).toList();
   }
 
   /// Mencari transaksi berdasarkan kata kunci pada catatan, deskripsi, kategori,

@@ -1,0 +1,298 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_large_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/widget_background"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <!-- Header Atas: Total Aset & Tombol Tambah / Aksi -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:layout_toStartOf="@+id/header_actions"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tv_large_total_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Total aset"
+                android:textColor="#8E95A2"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/tv_large_total_asset"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="Rp 12.480.000"
+                android:textColor="#FFFFFF"
+                android:textSize="22sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/header_actions"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/btn_large_toggle_eye"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_marginEnd="6dp"
+                android:padding="4dp"
+                android:src="@drawable/ic_widget_eye" />
+
+            <ImageView
+                android:id="@+id/btn_large_quick_add"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/widget_btn_circle_bg"
+                android:padding="10dp"
+                android:src="@drawable/ic_widget_add" />
+        </LinearLayout>
+    </RelativeLayout>
+
+    <!-- Baris 3 Kelompok Aset Utama -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="14dp"
+        android:orientation="horizontal">
+
+        <!-- Kartu Kelompok 1 -->
+        <LinearLayout
+            android:id="@+id/card_large_group1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="6dp"
+            android:layout_weight="1"
+            android:background="@drawable/widget_card_item_bg"
+            android:orientation="vertical"
+            android:paddingHorizontal="10dp"
+            android:paddingVertical="8dp">
+
+            <TextView
+                android:id="@+id/tv_large_group1_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="Tunai"
+                android:textColor="#8E95A2"
+                android:textSize="11sp" />
+
+            <TextView
+                android:id="@+id/tv_large_group1_val"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="1,2jt"
+                android:textColor="#FFFFFF"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <!-- Kartu Kelompok 2 -->
+        <LinearLayout
+            android:id="@+id/card_large_group2"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="3dp"
+            android:layout_weight="1"
+            android:background="@drawable/widget_card_item_bg"
+            android:orientation="vertical"
+            android:paddingHorizontal="10dp"
+            android:paddingVertical="8dp">
+
+            <TextView
+                android:id="@+id/tv_large_group2_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="Bank"
+                android:textColor="#8E95A2"
+                android:textSize="11sp" />
+
+            <TextView
+                android:id="@+id/tv_large_group2_val"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="10,1jt"
+                android:textColor="#FFFFFF"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <!-- Kartu Kelompok 3 -->
+        <LinearLayout
+            android:id="@+id/card_large_group3"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="6dp"
+            android:layout_weight="1"
+            android:background="@drawable/widget_card_item_bg"
+            android:orientation="vertical"
+            android:paddingHorizontal="10dp"
+            android:paddingVertical="8dp">
+
+            <TextView
+                android:id="@+id/tv_large_group3_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="Kartu"
+                android:textColor="#8E95A2"
+                android:textSize="11sp" />
+
+            <TextView
+                android:id="@+id/tv_large_group3_val"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="1,18jt"
+                android:textColor="#FFFFFF"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Garis Pemisah Tipis -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginVertical="12dp"
+        android:background="#272C36" />
+
+    <!-- Judul Transaksi Terbaru -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Transaksi terbaru"
+        android:textColor="#8E95A2"
+        android:textSize="12sp"
+        android:textStyle="bold" />
+
+    <!-- Daftar 3 Transaksi Terakhir -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:orientation="vertical">
+
+        <!-- Baris Transaksi 1 -->
+        <RelativeLayout
+            android:id="@+id/row_tx_1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingVertical="4dp">
+
+            <TextView
+                android:id="@+id/tv_large_tx1_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_toStartOf="@+id/tv_large_tx1_amount"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="Makanan · Dompet"
+                android:textColor="#E6EAF0"
+                android:textSize="13sp" />
+
+            <TextView
+                android:id="@+id/tv_large_tx1_amount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:text="-Rp 35.000"
+                android:textColor="#FF5C5C"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+        </RelativeLayout>
+
+        <!-- Baris Transaksi 2 -->
+        <RelativeLayout
+            android:id="@+id/row_tx_2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingVertical="4dp">
+
+            <TextView
+                android:id="@+id/tv_large_tx2_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_toStartOf="@+id/tv_large_tx2_amount"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="Transportasi · Kartu"
+                android:textColor="#E6EAF0"
+                android:textSize="13sp" />
+
+            <TextView
+                android:id="@+id/tv_large_tx2_amount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:text="-Rp 20.000"
+                android:textColor="#FF5C5C"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+        </RelativeLayout>
+
+        <!-- Baris Transaksi 3 -->
+        <RelativeLayout
+            android:id="@+id/row_tx_3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingVertical="4dp">
+
+            <TextView
+                android:id="@+id/tv_large_tx3_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_toStartOf="@+id/tv_large_tx3_amount"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="Gaji · Bank"
+                android:textColor="#E6EAF0"
+                android:textSize="13sp" />
+
+            <TextView
+                android:id="@+id/tv_large_tx3_amount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:text="+Rp 8.500.000"
+                android:textColor="#29B6F6"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+        </RelativeLayout>
+    </LinearLayout>
+</LinearLayout>
+

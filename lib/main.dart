@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:provider/provider.dart';
@@ -6,12 +7,14 @@ import 'package:provider/provider.dart';
 import 'core/app_settings.dart';
 import 'core/localization.dart';
 import 'core/security_service.dart';
+import 'core/widget_service.dart';
 import 'data/repository.dart';
 import 'features/aset/aset_page.dart';
 import 'features/keamanan/lock_screen.dart';
 import 'features/lainnya/lainnya_page.dart';
 import 'features/statistik/statistik_page.dart';
 import 'features/transaksi/transaksi_page.dart';
+import 'features/transaksi/tx_form_page.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -124,14 +127,17 @@ class HomeShell extends StatefulWidget {
 }
 
 class _HomeShellState extends State<HomeShell> {
+  static const _widgetChannel = MethodChannel('com.contoh.keuangan_saku/widget');
   int _index = 0;
 
   @override
   void initState() {
     super.initState();
+    _setupWidgetChannel();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       try {
-        final processed = await context.read<Repo>().processDueAutoRecurring();
+        final repo = context.read<Repo>();
+        final processed = await repo.processDueAutoRecurring();
         if (processed > 0 && mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -141,10 +147,40 @@ class _HomeShellState extends State<HomeShell> {
             ),
           );
         }
+        // Update data ke home screen widget saat app start
+        await WidgetService.updateWidgets(repo);
       } catch (e) {
-        debugPrint('Auto recurring process error: $e');
+        debugPrint('Auto recurring / widget sync error: $e');
       }
     });
+  }
+
+  void _setupWidgetChannel() {
+    _widgetChannel.setMethodCallHandler((call) async {
+      if (call.method == 'onQuickAction') {
+        final action = call.arguments as String?;
+        if (action != null) {
+          _handleQuickAction(action);
+        }
+      }
+    });
+
+    _widgetChannel.invokeMethod<String>('getInitialAction').then((action) {
+      if (action != null && mounted) {
+        _handleQuickAction(action);
+      }
+    }).catchError((_) {});
+  }
+
+  void _handleQuickAction(String action) {
+    if (!mounted) return;
+    if (action == 'expense') {
+      openTxForm(context, initialType: 'expense');
+    } else if (action == 'income') {
+      openTxForm(context, initialType: 'income');
+    } else if (action == 'add') {
+      openTxForm(context);
+    }
   }
 
   @override

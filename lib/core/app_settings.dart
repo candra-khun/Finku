@@ -275,22 +275,25 @@ class AppSettings extends ChangeNotifier {
     }
   }
 
-  /// Format ringkas (misal: 1,5jt atau 1.5M)
+  /// Format ringkas (misal: 1,5jt atau 1.5M, 5,25jt, 1,18jt)
   String formatCompact(int value) {
     final isEn = _languageCode == 'en';
     final sep = _currency.decimalSep;
 
+    String cleanDecimals(double val) {
+      var s = val.toStringAsFixed(2);
+      if (s.endsWith('0')) s = s.substring(0, s.length - 1);
+      if (s.endsWith('.0')) s = s.substring(0, s.length - 2);
+      return s.replaceAll('.', sep);
+    }
+
     if (value >= 1000000000) {
-      final v = value / 1000000000;
-      final s = v.toStringAsFixed(1).replaceAll('.', sep);
-      final clean = s.endsWith('${sep}0') ? s.substring(0, s.length - 2) : s;
-      return '$clean${isEn ? 'B' : 'M'}';
+      final s = cleanDecimals(value / 1000000000);
+      return '$s${isEn ? 'B' : 'M'}';
     }
     if (value >= 1000000) {
-      final v = value / 1000000;
-      final s = v.toStringAsFixed(1).replaceAll('.', sep);
-      final clean = s.endsWith('${sep}0') ? s.substring(0, s.length - 2) : s;
-      return '$clean${isEn ? 'M' : 'jt'}';
+      final s = cleanDecimals(value / 1000000);
+      return '$s${isEn ? 'M' : 'jt'}';
     }
     if (value >= 1000) {
       return '${value ~/ 1000}${isEn ? 'K' : 'rb'}';

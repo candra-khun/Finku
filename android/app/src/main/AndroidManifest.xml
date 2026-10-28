@@ -32,6 +32,34 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+
+        <!-- Small Widget (2x2) -->
+        <receiver
+            android:name=".SmallWidgetProvider"
+            android:label="@string/widget_small_name"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.contoh.keuangan_saku.ACTION_TOGGLE_HIDE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_small_info" />
+        </receiver>
+
+        <!-- Large Widget (4x3) -->
+        <receiver
+            android:name=".LargeWidgetProvider"
+            android:label="@string/widget_large_name"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.contoh.keuangan_saku.ACTION_TOGGLE_HIDE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_large_info" />
+        </receiver>
     </application>
     <!-- Required to query activities that can process text, see:
          https://developer.android.com/training/package-visibility and

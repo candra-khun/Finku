@@ -15,6 +15,7 @@ import '../master/master_bahasa_page.dart';
 import '../tag/kelola_tag_page.dart';
 import '../tagihan/tagihan_page.dart';
 import '../target/target_page.dart';
+import '../widget/widget_preview_page.dart';
 
 enum CsvPeriodMode { all, thisMonth, thisYear, custom }
 
@@ -663,6 +664,30 @@ class _LainnyaPageState extends State<LainnyaPage> {
                               builder: (_) => const MasterBahasaPage()),
                         );
                         setState(() {});
+                      },
+                    ),
+                    Divider(
+                        height: 1,
+                        indent: 64,
+                        color: isDark ? Colors.white12 : Colors.black12),
+                    ListTile(
+                      leading: CircleAvatar(
+                        backgroundColor: Colors.purple.withValues(alpha: 0.15),
+                        child: const Icon(Icons.widgets_outlined,
+                            color: Colors.purple),
+                      ),
+                      title: Text('Widget Layar Utama'.tr,
+                          style: const TextStyle(fontWeight: FontWeight.w600)),
+                      subtitle: Text(
+                        'Widget kecil (2x2) dan besar (4x3) di Home Screen'.tr,
+                      ),
+                      trailing: const Icon(Icons.chevron_right),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (_) => const WidgetPreviewPage()),
+                        );
                       },
                     ),
                   ],

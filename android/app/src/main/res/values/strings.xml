@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Finku</string>
+    <string name="widget_small_name">Ringkasan Bulan Ini (2x2)</string>
+    <string name="widget_small_desc">Ringkasan pengeluaran dan pemasukan bulan ini serta tombol catat cepat.</string>
+    <string name="widget_large_name">Total Aset dan Riwayat (4x3)</string>
+    <string name="widget_large_desc">Saldo per kelompok aset dan 3 transaksi terbaru.</string>
+</resources>
+

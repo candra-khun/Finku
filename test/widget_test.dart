@@ -151,4 +151,26 @@ void main() {
     // Kembalikan ke id
     await settings.setLanguage('id');
   });
+
+  test('format data dan teks lokalisasi widget layar utama', () {
+    // Verifikasi teks widget di kedua bahasa
+    expect('Widget Layar Utama'.tr, 'Widget Layar Utama');
+    expect('Widget kecil (2x2)'.tr, 'Widget kecil (2x2)');
+    expect('Widget besar (4x3)'.tr, 'Widget besar (4x3)');
+
+    AppSettings.instance.setLanguage('en');
+    expect('Widget Layar Utama'.tr, 'Home Screen Widgets');
+    expect('Widget kecil (2x2)'.tr, 'Small Widget (2x2)');
+    expect('Widget besar (4x3)'.tr, 'Large Widget (4x3)');
+
+    AppSettings.instance.setLanguage('id');
+
+    // Verifikasi format ringkas untuk widget
+    expect(ringkas(8500000), '8,5jt');
+    expect(ringkas(5250000), '5,25jt');
+    expect(ringkas(1200000), '1,2jt');
+    expect(ringkas(1180000), '1,18jt');
+    expect(rupiah(3250000), 'Rp 3.250.000');
+    expect(rupiah(12480000), 'Rp 12.480.000');
+  });
 }
