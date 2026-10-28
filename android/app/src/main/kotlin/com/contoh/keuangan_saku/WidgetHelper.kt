@@ -17,6 +17,8 @@ object WidgetHelper {
     const val ACTION_QUICK_ADD_INCOME = "com.contoh.keuangan_saku.ACTION_QUICK_ADD_INCOME"
     const val ACTION_QUICK_ADD = "com.contoh.keuangan_saku.ACTION_QUICK_ADD"
 
+    private var lastToggleTime = 0L
+
     fun getPrefs(context: Context): SharedPreferences {
         return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
     }
@@ -25,7 +27,15 @@ object WidgetHelper {
         return getPrefs(context).getBoolean(KEY_HIDE_BALANCE, false)
     }
 
+    @Synchronized
     fun toggleBalanceHidden(context: Context): Boolean {
+        val now = System.currentTimeMillis()
+        // Cegah eksekusi ganda jika dipanggil berdekatan oleh multiple receivers
+        if (now - lastToggleTime < 400L) {
+            return isBalanceHidden(context)
+        }
+        lastToggleTime = now
+
         val prefs = getPrefs(context)
         val current = prefs.getBoolean(KEY_HIDE_BALANCE, false)
         val updated = !current
@@ -35,28 +45,46 @@ object WidgetHelper {
     }
 
     fun updateAllWidgets(context: Context) {
-        val appWidgetManager = AppWidgetManager.getInstance(context)
+        try {
+            val appWidgetManager = AppWidgetManager.getInstance(context)
 
-        // Update Small Widgets
-        val smallComponent = ComponentName(context, SmallWidgetProvider::class.java)
-        val smallIds = appWidgetManager.getAppWidgetIds(smallComponent)
-        if (smallIds.isNotEmpty()) {
-            val intent = Intent(context, SmallWidgetProvider::class.java).apply {
-                action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
-                putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, smallIds)
+            // Update Small Widgets
+            val smallComponent = ComponentName(context, SmallWidgetProvider::class.java)
+            val smallIds = appWidgetManager.getAppWidgetIds(smallComponent)
+            if (smallIds.isNotEmpty()) {
+                for (id in smallIds) {
+                    try {
+                        SmallWidgetProvider.updateAppWidget(context, appWidgetManager, id)
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                }
+                val intent = Intent(context, SmallWidgetProvider::class.java).apply {
+                    action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
+                    putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, smallIds)
+                }
+                context.sendBroadcast(intent)
             }
-            context.sendBroadcast(intent)
-        }
 
-        // Update Large Widgets
-        val largeComponent = ComponentName(context, LargeWidgetProvider::class.java)
-        val largeIds = appWidgetManager.getAppWidgetIds(largeComponent)
-        if (largeIds.isNotEmpty()) {
-            val intent = Intent(context, LargeWidgetProvider::class.java).apply {
-                action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
-                putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, largeIds)
+            // Update Large Widgets
+            val largeComponent = ComponentName(context, LargeWidgetProvider::class.java)
+            val largeIds = appWidgetManager.getAppWidgetIds(largeComponent)
+            if (largeIds.isNotEmpty()) {
+                for (id in largeIds) {
+                    try {
+                        LargeWidgetProvider.updateAppWidget(context, appWidgetManager, id)
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                }
+                val intent = Intent(context, LargeWidgetProvider::class.java).apply {
+                    action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
+                    putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, largeIds)
+                }
+                context.sendBroadcast(intent)
             }
-            context.sendBroadcast(intent)
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 
@@ -71,9 +99,10 @@ object WidgetHelper {
         return PendingIntent.getActivity(context, requestCode, intent, flags)
     }
 
-    fun getToggleHidePendingIntent(context: Context, requestCode: Int = 100): PendingIntent {
-        val intent = Intent(ACTION_TOGGLE_HIDE).apply {
-            setPackage(context.packageName)
+    fun getToggleHidePendingIntent(context: Context, targetClass: Class<*>, requestCode: Int = 100): PendingIntent {
+        // Menggunakan Explicit Intent langsung ke kelas target receiver
+        val intent = Intent(context, targetClass).apply {
+            action = ACTION_TOGGLE_HIDE
         }
         val flags = PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         return PendingIntent.getBroadcast(context, requestCode, intent, flags)
@@ -87,4 +116,3 @@ object WidgetHelper {
         return if (isHidden) "••••" else actual
     }
 }
-

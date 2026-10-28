@@ -5,7 +5,10 @@
     android:layout_height="match_parent"
     android:background="@drawable/widget_background"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:paddingLeft="16dp"
+    android:paddingTop="16dp"
+    android:paddingRight="16dp"
+    android:paddingBottom="16dp">
 
     <!-- Header: Bulan & Ikon Mata -->
     <RelativeLayout
@@ -77,13 +80,10 @@
             android:textSize="12sp"
             android:textStyle="bold" />
 
-        <Space
-            android:layout_width="16dp"
-            android:layout_height="wrap_content" />
-
         <ImageView
             android:layout_width="14dp"
             android:layout_height="14dp"
+            android:layout_marginStart="16dp"
             android:src="@drawable/ic_widget_arrow_up" />
 
         <TextView
@@ -97,7 +97,8 @@
             android:textStyle="bold" />
     </LinearLayout>
 
-    <Space
+    <!-- Spacer fleksibel menggunakan FrameLayout (didukung RemoteViews) -->
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1" />
@@ -159,4 +160,3 @@
         </LinearLayout>
     </LinearLayout>
 </LinearLayout>
-
