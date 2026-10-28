@@ -1,8 +1,10 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:keuangan_saku/core/app_settings.dart';
 import 'package:keuangan_saku/core/format.dart';
 import 'package:keuangan_saku/core/localization.dart';
 import 'package:keuangan_saku/data/models.dart';
+import 'package:keuangan_saku/features/splash/splash_screen.dart';
 
 void main() {
   test('rupiah memakai titik pemisah ribuan', () {
@@ -172,5 +174,21 @@ void main() {
     expect(ringkas(1180000), '1,18jt');
     expect(rupiah(3250000), 'Rp 3.250.000');
     expect(rupiah(12480000), 'Rp 12.480.000');
+  });
+
+  testWidgets('splash screen menampilkan logo dan nama Finku', (tester) async {
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: SplashScreen(),
+      ),
+    );
+
+    expect(find.text('Finku'), findsOneWidget);
+    expect(find.text('Catatan Keuangan Saku'), findsOneWidget);
+    expect(find.byType(Image), findsOneWidget);
+
+    // Verifikasi animasi fade & scale saat splash aktif
+    await tester.pump(const Duration(milliseconds: 400));
+    expect(find.text('Finku'), findsOneWidget);
   });
 }

@@ -12,6 +12,7 @@ import 'data/repository.dart';
 import 'features/aset/aset_page.dart';
 import 'features/keamanan/lock_screen.dart';
 import 'features/lainnya/lainnya_page.dart';
+import 'features/splash/splash_screen.dart';
 import 'features/statistik/statistik_page.dart';
 import 'features/transaksi/transaksi_page.dart';
 import 'features/transaksi/tx_form_page.dart';
@@ -31,6 +32,8 @@ Future<void> main() async {
 }
 
 class KeuanganApp extends StatelessWidget {
+  static bool hasShownSplash = false;
+
   const KeuanganApp({super.key});
 
   static const _seed = Color(0xFF2E7D6B);
@@ -61,7 +64,7 @@ class KeuanganApp extends StatelessWidget {
           builder: (context, child) {
             return SecurityGuard(child: child ?? const SizedBox.shrink());
           },
-          home: const HomeShell(),
+          home: hasShownSplash ? const HomeShell() : const SplashScreen(),
         );
       },
     );
