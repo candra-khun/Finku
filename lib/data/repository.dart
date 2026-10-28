@@ -154,6 +154,23 @@ class Repo extends ChangeNotifier {
     _changed();
   }
 
+  /// Menyimpan saldo awal beberapa aset dalam satu transaksi database.
+  Future<void> updateInitialBalances(Map<int, int> balances) async {
+    if (balances.isEmpty) return;
+    final db = await _d.db;
+    await db.transaction((txn) async {
+      for (final entry in balances.entries) {
+        await txn.update(
+          'assets',
+          {'initial_balance': entry.value},
+          where: 'id = ?',
+          whereArgs: [entry.key],
+        );
+      }
+    });
+    _changed();
+  }
+
   Future<void> reorderAssets(List<int> orderedIds) async {
     final db = await _d.db;
     await db.transaction((txn) async {

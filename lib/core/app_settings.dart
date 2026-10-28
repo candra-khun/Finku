@@ -67,6 +67,7 @@ class AppSettings extends ChangeNotifier {
   static const _kLanguage = 'app_language';
   static const _kCurrencyCode = 'app_currency_code';
   static const _kCustomCurrencies = 'app_custom_currencies';
+  static const _kOnboardingCompleted = 'app_onboarding_completed';
 
   SharedPreferences? _prefs;
   bool _initialized = false;
@@ -176,6 +177,8 @@ class AppSettings extends ChangeNotifier {
   final List<CurrencyModel> _customCurrencies = [];
 
   bool get isInitialized => _initialized;
+  bool get isOnboardingCompleted =>
+      _prefs?.getBool(_kOnboardingCompleted) ?? false;
   String get languageCode => _languageCode;
   bool get isEnglish => _languageCode == 'en';
   bool get isIndonesian => _languageCode == 'id';
@@ -215,6 +218,11 @@ class AppSettings extends ChangeNotifier {
       debugPrint('AppSettings init error: $e');
     }
     _initialized = true;
+    notifyListeners();
+  }
+
+  Future<void> completeOnboarding() async {
+    await _prefs?.setBool(_kOnboardingCompleted, true);
     notifyListeners();
   }
 
