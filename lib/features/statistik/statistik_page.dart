@@ -855,6 +855,7 @@ class _CalloutItem {
   final Color color;
   final double midAngle;
   final Offset pStart;
+  final Offset pRadial;
   final bool isRight;
   double targetY;
   late TextPainter textPainter;
@@ -866,6 +867,7 @@ class _CalloutItem {
     required this.color,
     required this.midAngle,
     required this.pStart,
+    required this.pRadial,
     required this.isRight,
     required this.targetY,
   });
@@ -891,8 +893,8 @@ class _PieChartWithCallouts extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         final w = constraints.maxWidth;
-        // Memberi tinggi yang lebih leluasa agar label dan garis callout tidak berdesakan
-        final h = (w * 0.78).clamp(280.0, 340.0);
+        // Memberikan tinggi canvas yang lega (330 - 370dp) agar seluruh label memiliki ruang vertikal yang lapang
+        final h = (w * 0.88).clamp(330.0, 370.0);
         return SizedBox(
           width: w,
           height: h,
@@ -932,7 +934,7 @@ class _PieChartPainter extends CustomPainter {
 
     final center = Offset(size.width / 2, size.height / 2);
     // Radius lingkaran pie yang proporsional sehingga menyisakan ruang callout yang lega di kiri dan kanan
-    final radius = (size.width * 0.18).clamp(56.0, 74.0);
+    final radius = (size.width * 0.175).clamp(54.0, 72.0);
 
     // Sudut awal ~ -0.35 * pi (~ -63 derajat, sekitar jam 1)
     const startAngle = -math.pi * 0.35;
@@ -974,14 +976,10 @@ class _PieChartPainter extends CustomPainter {
       currentAngle += sweep;
     }
 
-    // 2. Siapkan Callout Items (Dengan Seleksi Kategori yang Signifikan)
-    final maxLabelWidth = (center.dx - radius - 36).clamp(65.0, 110.0);
+    // 2. Siapkan Callout Items untuk SEMUA kategori (tidak ada irisan kecil yang dihilangkan)
+    final maxLabelWidth = (center.dx - radius - 38).clamp(65.0, 115.0);
     final leftItems = <_CalloutItem>[];
     final rightItems = <_CalloutItem>[];
-
-    // Ambang batas: jika total kategori banyak (> 6), filter irisan yang sangat kecil (< 1.8%)
-    // agar diagram tidak ruwet dan berdesakan, namun pastikan minimal 5 irisan teratas selalu dapat callout.
-    final bool filterMinor = stats.length > 6;
 
     currentAngle = startAngle;
     for (var i = 0; i < stats.length; i++) {
@@ -993,19 +991,19 @@ class _PieChartPainter extends CustomPainter {
       if (s.total <= 0) continue;
 
       final pct = (s.total * 100) / total;
-      if (filterMinor && i >= 6 && pct < 1.8) {
-        // Lewati callout garis untuk irisan ekstra kecil yang berhimpitan,
-        // rincian lengkap tetap ditampilkan di tabel daftar bawah.
-        continue;
-      }
-
       final color = palette[i % palette.length];
       final isRight = math.cos(midAngle) >= 0;
 
-      // Titik awal tepat di tepi lingkaran pie (+ 2px untuk estetika)
+      // Titik awal tepat di tepi luar busur pie
       final pStart = Offset(
         center.dx + (radius + 2.0) * math.cos(midAngle),
         center.dy + (radius + 2.0) * math.sin(midAngle),
+      );
+
+      // Titik kedua memancar keluar secara radial (tegak lurus busur)
+      final pRadial = Offset(
+        center.dx + (radius + 11.0) * math.cos(midAngle),
+        center.dy + (radius + 11.0) * math.sin(midAngle),
       );
 
       final displayName = s.category.name.length > 14
@@ -1026,9 +1024,9 @@ class _PieChartPainter extends CustomPainter {
           TextSpan(
             text: '${pct.toStringAsFixed(1)}%',
             style: TextStyle(
-              color: isDark ? const Color(0xFFB0B7C3) : const Color(0xFF555E6D),
-              fontSize: 10.5,
-              fontWeight: FontWeight.w600,
+              color: isDark ? const Color(0xFF9E9E9E) : const Color(0xFF616161),
+              fontSize: 10,
+              fontWeight: FontWeight.normal,
               height: 1.25,
             ),
           ),
@@ -1050,8 +1048,9 @@ class _PieChartPainter extends CustomPainter {
         color: color,
         midAngle: midAngle,
         pStart: pStart,
+        pRadial: pRadial,
         isRight: isRight,
-        targetY: pStart.dy,
+        targetY: pRadial.dy,
       )..textPainter = tp;
 
       if (isRight) {
@@ -1061,16 +1060,16 @@ class _PieChartPainter extends CustomPainter {
       }
     }
 
-    // 3. Sorting Monotonik: Wajib diurutkan dari atas ke bawah (pStart.dy)
-    // Ini menjamin secara matematis bahwa garis TIDAK AKAN PERNAH BERSILANGAN.
-    rightItems.sort((a, b) => a.pStart.dy.compareTo(b.pStart.dy));
-    leftItems.sort((a, b) => a.pStart.dy.compareTo(b.pStart.dy));
+    // 3. Sorting Monotonik Berdasarkan Sudut Y di Pie:
+    // Menjamin secara matematis bahwa garis-garis TIDAK AKAN PERNAH BERSILANGAN.
+    rightItems.sort((a, b) => math.sin(a.midAngle).compareTo(math.sin(b.midAngle)));
+    leftItems.sort((a, b) => math.sin(a.midAngle).compareTo(math.sin(b.midAngle)));
 
-    // 4. Distribusi Vertikal Callouts (Mencegah Overlap Teks & Label)
+    // 4. Distribusi Vertikal Callouts dengan Jarak Seragam & Anti-Tabrakan
     _distributeCallouts(rightItems, size.height);
     _distributeCallouts(leftItems, size.height);
 
-    // 5. Gambar Leader Lines yang Rapi, Dot Indikator, dan Teks
+    // 5. Gambar Leader Lines yang Memancar Anggun dan Teks Label
     _drawCalloutGroup(canvas, size, center, radius, rightItems, isRight: true);
     _drawCalloutGroup(canvas, size, center, radius, leftItems, isRight: false);
   }
@@ -1085,14 +1084,11 @@ class _PieChartPainter extends CustomPainter {
   }) {
     if (items.isEmpty) return;
 
-    // Kolom siku lurus vertikal yang sejajar
-    final elbowX = isRight ? center.dx + radius + 22.0 : center.dx - radius - 22.0;
-
     for (final item in items) {
       final linePaint = Paint()
         ..color = item.color
         ..style = PaintingStyle.stroke
-        ..strokeWidth = 1.3
+        ..strokeWidth = 1.2
         ..strokeCap = StrokeCap.round
         ..strokeJoin = StrokeJoin.round;
 
@@ -1100,19 +1096,23 @@ class _PieChartPainter extends CustomPainter {
         ..color = item.color
         ..style = PaintingStyle.fill;
 
-      // Gambar dot pin kecil di tepi irisan pie
+      // Titik pin kecil di tepi irisan pie
       canvas.drawCircle(item.pStart, 2.0, dotPaint);
 
-      final pElbow = Offset(elbowX, item.targetY);
-
+      // Titik siku horizontal disesuaikan dengan posisi pRadial agar transisi garis alami
+      final double elbowX;
       if (isRight) {
+        final baseElbowX = center.dx + radius + 16.0;
+        elbowX = math.max(item.pRadial.dx + 8.0, baseElbowX);
+        final pElbow = Offset(elbowX, item.targetY);
         final pEnd = Offset(
-          math.min(elbowX + 14.0, size.width - item.textPainter.width - 4.0),
+          math.min(elbowX + 10.0, size.width - item.textPainter.width - 4.0),
           item.targetY,
         );
 
         final path = Path()
           ..moveTo(item.pStart.dx, item.pStart.dy)
+          ..lineTo(item.pRadial.dx, item.pRadial.dy)
           ..lineTo(pElbow.dx, pElbow.dy)
           ..lineTo(pEnd.dx, pEnd.dy);
 
@@ -1123,13 +1123,17 @@ class _PieChartPainter extends CustomPainter {
           Offset(pEnd.dx + 4.0, item.targetY - item.textPainter.height / 2),
         );
       } else {
+        final baseElbowX = center.dx - radius - 16.0;
+        elbowX = math.min(item.pRadial.dx - 8.0, baseElbowX);
+        final pElbow = Offset(elbowX, item.targetY);
         final pEnd = Offset(
-          math.max(elbowX - 14.0, item.textPainter.width + 4.0),
+          math.max(elbowX - 10.0, item.textPainter.width + 4.0),
           item.targetY,
         );
 
         final path = Path()
           ..moveTo(item.pStart.dx, item.pStart.dy)
+          ..lineTo(item.pRadial.dx, item.pRadial.dy)
           ..lineTo(pElbow.dx, pElbow.dy)
           ..lineTo(pEnd.dx, pEnd.dy);
 
@@ -1149,11 +1153,12 @@ class _PieChartPainter extends CustomPainter {
   void _distributeCallouts(List<_CalloutItem> items, double canvasHeight) {
     if (items.isEmpty) return;
 
-    const minGap = 30.0; // Jarak vertikal aman antar baris label
+    // Jarak vertikal nyaman antar label agar tidak bertumpuk
+    const minGap = 27.0;
     final totalNeeded = (items.length - 1) * minGap;
 
     // Rata-rata titik Y awal irisan
-    final avgStartY = items.map((e) => e.pStart.dy).reduce((a, b) => a + b) / items.length;
+    final avgStartY = items.map((e) => e.pRadial.dy).reduce((a, b) => a + b) / items.length;
 
     // Awal distribusi Y di sekitar rata-rata posisi pie
     var startY = (avgStartY - totalNeeded / 2).clamp(16.0, canvasHeight - totalNeeded - 16.0);
@@ -1162,20 +1167,34 @@ class _PieChartPainter extends CustomPainter {
       items[i].targetY = startY + i * minGap;
     }
 
-    // Koreksi batas atas dan bawah secara halus
-    if (items.last.targetY > canvasHeight - 16.0) {
-      items.last.targetY = canvasHeight - 16.0;
-      for (var k = items.length - 2; k >= 0; k--) {
-        if (items[k].targetY > items[k + 1].targetY - minGap) {
-          items[k].targetY = items[k + 1].targetY - minGap;
+    // Pass 1: Tarik sedikit ke arah pRadial.dy masing-masing agar garis lebih ringkas
+    for (var iter = 0; iter < 2; iter++) {
+      for (var i = 0; i < items.length; i++) {
+        final diff = items[i].pRadial.dy - items[i].targetY;
+        items[i].targetY += diff * 0.3;
+      }
+      // Enforce order dari atas ke bawah
+      for (var i = 1; i < items.length; i++) {
+        if (items[i].targetY < items[i - 1].targetY + minGap) {
+          items[i].targetY = items[i - 1].targetY + minGap;
         }
       }
-    }
-    if (items.first.targetY < 16.0) {
-      items.first.targetY = 16.0;
-      for (var k = 1; k < items.length; k++) {
-        if (items[k].targetY < items[k - 1].targetY + minGap) {
-          items[k].targetY = items[k - 1].targetY + minGap;
+      // Enforce bottom boundary
+      if (items.last.targetY > canvasHeight - 16.0) {
+        items.last.targetY = canvasHeight - 16.0;
+        for (var k = items.length - 2; k >= 0; k--) {
+          if (items[k].targetY > items[k + 1].targetY - minGap) {
+            items[k].targetY = items[k + 1].targetY - minGap;
+          }
+        }
+      }
+      // Enforce top boundary
+      if (items.first.targetY < 16.0) {
+        items.first.targetY = 16.0;
+        for (var k = 1; k < items.length; k++) {
+          if (items[k].targetY < items[k - 1].targetY + minGap) {
+            items[k].targetY = items[k - 1].targetY + minGap;
+          }
         }
       }
     }
