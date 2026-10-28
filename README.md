@@ -82,7 +82,7 @@ Finku terbagi ke dalam 4 modul utama pada menu navigasi bawah (*Bottom Navigatio
 
 ---
 
-## 🛠️ Struktur Proyek
+## Struktur Proyek
 
 ```text
 lib/
