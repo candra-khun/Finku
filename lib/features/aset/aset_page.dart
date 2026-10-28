@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../../core/dialogs.dart';
 import '../../core/format.dart';
+import '../../core/localization.dart';
 import '../../core/widgets.dart';
 import '../../data/models.dart';
 import '../../data/repository.dart';
@@ -46,17 +47,17 @@ class _AsetPageState extends State<AsetPage> with SingleTickerProviderStateMixin
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Aset & Target'),
+        title: Text('Aset & Target'.tr),
         bottom: TabBar(
           controller: _tabController,
-          tabs: const [
+          tabs: [
             Tab(
-              icon: Icon(Icons.account_balance_wallet_outlined),
-              text: 'Daftar Aset',
+              icon: const Icon(Icons.account_balance_wallet_outlined),
+              text: 'Daftar Aset'.tr,
             ),
             Tab(
-              icon: Icon(Icons.flag_outlined),
-              text: 'Target Menabung',
+              icon: const Icon(Icons.flag_outlined),
+              text: 'Target Menabung'.tr,
             ),
           ],
         ),
@@ -64,7 +65,7 @@ class _AsetPageState extends State<AsetPage> with SingleTickerProviderStateMixin
           if (isAsetTab)
             IconButton(
               icon: const Icon(Icons.swap_vert),
-              tooltip: 'Urutkan grup',
+              tooltip: 'Urutkan grup'.tr,
               onPressed: () => _showReorderGroups(context),
             ),
         ],
@@ -78,7 +79,7 @@ class _AsetPageState extends State<AsetPage> with SingleTickerProviderStateMixin
           }
         },
         icon: const Icon(Icons.add),
-        label: Text(isAsetTab ? 'Tambah Aset' : 'Buat Target'),
+        label: Text(isAsetTab ? 'Tambah Aset'.tr : 'Buat Target'.tr),
       ),
       body: TabBarView(
         controller: _tabController,
@@ -110,19 +111,19 @@ class _AsetPageState extends State<AsetPage> with SingleTickerProviderStateMixin
           padding: const EdgeInsets.only(bottom: 96),
           children: [
             _SummaryCard(assets: assets, debts: debts),
-            const _SectionHeader('Aset utama'),
+            _SectionHeader('Aset utama'.tr),
             for (final g in main)
               _GroupCard(
                 group: g,
                 items: balances.where((b) => b.asset.groupId == g.id).toList(),
               ),
             const Divider(height: 32),
-            const _SectionHeader('Aset tambahan'),
+            _SectionHeader('Aset tambahan'.tr),
             if (extra.isEmpty)
-              const Padding(
-                padding: EdgeInsets.fromLTRB(16, 4, 16, 16),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 4, 16, 16),
                 child: Text(
-                  'Belum ada grup tambahan. Ketuk Tambah untuk membuat grup aset baru, misalnya Dompet digital atau Investasi.',
+                  'Belum ada grup tambahan. Ketuk Tambah untuk membuat grup aset baru, misalnya Dompet digital atau Investasi.'.tr,
                 ),
               )
             else
@@ -148,8 +149,8 @@ class _AsetPageState extends State<AsetPage> with SingleTickerProviderStateMixin
           children: [
             ListTile(
               leading: const Icon(Icons.account_balance_wallet_outlined),
-              title: const Text('Tambah aset'),
-              subtitle: const Text('Dompet, rekening, atau kartu baru'),
+              title: Text('Tambah aset'.tr),
+              subtitle: Text('Dompet, rekening, atau kartu baru'.tr),
               onTap: () {
                 Navigator.pop(ctx);
                 showAddAssetDialog(context, repo);
@@ -157,8 +158,8 @@ class _AsetPageState extends State<AsetPage> with SingleTickerProviderStateMixin
             ),
             ListTile(
               leading: const Icon(Icons.create_new_folder_outlined),
-              title: const Text('Tambah grup aset'),
-              subtitle: const Text('Kelompok baru di bagian aset tambahan'),
+              title: Text('Tambah grup aset'.tr),
+              subtitle: Text('Kelompok baru di bagian aset tambahan'.tr),
               onTap: () {
                 Navigator.pop(ctx);
                 showAddGroupDialog(context, repo);
@@ -187,7 +188,7 @@ class _AsetPageState extends State<AsetPage> with SingleTickerProviderStateMixin
       context: context,
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setState) => AlertDialog(
-          title: const Text('Urutkan Grup Aset'),
+          title: Text('Urutkan Grup Aset'.tr),
           content: SizedBox(
             width: double.maxFinite,
             height: 350,
@@ -217,14 +218,14 @@ class _AsetPageState extends State<AsetPage> with SingleTickerProviderStateMixin
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(ctx),
-              child: const Text('Batal'),
+              child: Text('Batal'.tr),
             ),
             FilledButton(
               onPressed: () async {
                 Navigator.pop(ctx);
                 await repo.reorderGroups(items.map((g) => g.id).toList());
               },
-              child: const Text('Simpan Urutan'),
+              child: Text('Simpan'.tr),
             ),
           ],
         ),
@@ -282,9 +283,9 @@ class _SummaryCard extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
         child: Row(
           children: [
-            cell('Aset', assets, incomeColor),
-            cell('Utang', debts, debts < 0 ? expenseColor : null),
-            cell('Saldo bersih', assets + debts, null),
+            cell('Aset'.tr, assets, incomeColor),
+            cell('Utang'.tr, debts, debts < 0 ? expenseColor : null),
+            cell('Saldo bersih'.tr, assets + debts, null),
           ],
         ),
       ),
@@ -330,24 +331,24 @@ class _GroupCard extends StatelessWidget {
                 }
               },
               itemBuilder: (ctx) => [
-                const PopupMenuItem(
+                PopupMenuItem(
                   value: 'edit',
                   child: Row(
                     children: [
-                      Icon(Icons.edit_outlined, size: 18),
-                      SizedBox(width: 8),
-                      Text('Ubah nama grup'),
+                      const Icon(Icons.edit_outlined, size: 18),
+                      const SizedBox(width: 8),
+                      Text('Ubah'.tr),
                     ],
                   ),
                 ),
                 if (!group.isDefault)
-                  const PopupMenuItem(
+                  PopupMenuItem(
                     value: 'delete',
                     child: Row(
                       children: [
-                        Icon(Icons.delete_outline, color: Colors.redAccent, size: 18),
-                        SizedBox(width: 8),
-                        Text('Hapus grup', style: TextStyle(color: Colors.redAccent)),
+                        const Icon(Icons.delete_outline, color: Colors.redAccent, size: 18),
+                        const SizedBox(width: 8),
+                        Text('Hapus'.tr, style: const TextStyle(color: Colors.redAccent)),
                       ],
                     ),
                   ),
@@ -357,7 +358,7 @@ class _GroupCard extends StatelessWidget {
         ),
         children: [
           if (items.isEmpty)
-            const ListTile(dense: true, title: Text('Belum ada aset di grup ini.')),
+            ListTile(dense: true, title: Text('Belum ada aset di grup ini.'.tr)),
           for (final b in items)
             ListTile(
               dense: true,
@@ -377,7 +378,7 @@ class _GroupCard extends StatelessWidget {
               onPressed: () =>
                   showAddAssetDialog(context, context.read<Repo>(), initialGroupId: group.id),
               icon: const Icon(Icons.add, size: 18),
-              label: const Text('Tambah aset'),
+              label: Text('Tambah aset'.tr),
             ),
           ),
         ],

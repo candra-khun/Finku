@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
+import '../../core/app_settings.dart';
 import '../../core/format.dart';
+import '../../core/localization.dart';
 import '../../data/models.dart';
 import '../../data/repository.dart';
 import 'target_icons.dart';
@@ -157,7 +159,7 @@ class _GoalFormPageState extends State<GoalFormPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(isEdit ? 'Ubah Target' : 'Buat Target Menabung'),
+        title: Text(isEdit ? 'Ubah Target'.tr : 'Buat Target Menabung'.tr),
       ),
       body: _loading
           ? const Center(child: CircularProgressIndicator())
@@ -189,7 +191,7 @@ class _GoalFormPageState extends State<GoalFormPage> {
                   TextFormField(
                     controller: _titleCtrl,
                     decoration: InputDecoration(
-                      labelText: 'Nama Target *',
+                      labelText: 'Nama Target *'.tr,
                       hintText: 'Misal: Beli Laptop Baru, Dana Darurat, Umrah',
                       border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                       prefixIcon: const Icon(Icons.bookmark_outline),
@@ -210,9 +212,9 @@ class _GoalFormPageState extends State<GoalFormPage> {
                       ThousandsSeparatorInputFormatter(),
                     ],
                     decoration: InputDecoration(
-                      labelText: 'Target Nominal *',
+                      labelText: 'Target Nominal *'.tr,
                       hintText: '0',
-                      prefixText: 'Rp ',
+                      prefixText: '${AppSettings.instance.currency.symbol} ',
                       border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                       prefixIcon: const Icon(Icons.savings_outlined),
                     ),
@@ -234,9 +236,9 @@ class _GoalFormPageState extends State<GoalFormPage> {
                         ThousandsSeparatorInputFormatter(),
                       ],
                       decoration: InputDecoration(
-                        labelText: 'Saldo Awal Tersimpan (Opsional)',
+                        labelText: 'Saldo Awal Tersimpan (Opsional)'.tr,
                         hintText: '0',
-                        prefixText: 'Rp ',
+                        prefixText: '${AppSettings.instance.currency.symbol} ',
                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                         prefixIcon: const Icon(Icons.account_balance_wallet_outlined),
                         helperText: 'Isi jika Anda sudah memiliki dana tabungan awal untuk target ini',
@@ -282,10 +284,10 @@ class _GoalFormPageState extends State<GoalFormPage> {
                         children: [
                           SwitchListTile.adaptive(
                             contentPadding: EdgeInsets.zero,
-                            title: const Text('Batas Waktu (Deadline)', style: TextStyle(fontWeight: FontWeight.w600)),
+                            title: Text('Batas Waktu (Deadline)'.tr, style: const TextStyle(fontWeight: FontWeight.w600)),
                             subtitle: Text(_hasDeadline
-                                ? (_targetDate != null ? tglPanjang(_targetDate!) : 'Pilih tanggal')
-                                : 'Target fleksibel tanpa batas waktu'),
+                                ? (_targetDate != null ? tglPanjang(_targetDate!) : 'Pilih tanggal'.tr)
+                                : 'Target fleksibel tanpa batas waktu'.tr),
                             value: _hasDeadline,
                             onChanged: (val) {
                               setState(() {
@@ -313,7 +315,7 @@ class _GoalFormPageState extends State<GoalFormPage> {
                   const SizedBox(height: 20),
 
                   // Pilihan Warna
-                  const Text('Pilih Warna Target', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+                  Text('Pilih Warna Target'.tr, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
                   const SizedBox(height: 8),
                   SizedBox(
                     height: 44,
@@ -356,7 +358,7 @@ class _GoalFormPageState extends State<GoalFormPage> {
                   const SizedBox(height: 20),
 
                   // Pilihan Ikon
-                  const Text('Pilih Ikon Target', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+                  Text('Pilih Ikon Target'.tr, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
                   const SizedBox(height: 8),
                   Wrap(
                     spacing: 8,
@@ -408,7 +410,7 @@ class _GoalFormPageState extends State<GoalFormPage> {
                     controller: _noteCtrl,
                     maxLines: 2,
                     decoration: InputDecoration(
-                      labelText: 'Catatan Tambahan (Opsional)',
+                      labelText: 'Catatan Tambahan (Opsional)'.tr,
                       hintText: 'Misal: Menabung 500rb per bulan dari gaji',
                       border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                     ),
@@ -416,13 +418,15 @@ class _GoalFormPageState extends State<GoalFormPage> {
                   const SizedBox(height: 32),
 
                   // Tombol Simpan
-                  FilledButton.icon(
+                  FilledButton(
                     onPressed: _save,
-                    icon: const Icon(Icons.check),
-                    label: Text(isEdit ? 'Simpan Perubahan' : 'Buat Target Sekarang'),
                     style: FilledButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 14),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                    ),
+                    child: Text(
+                      isEdit ? 'Simpan Perubahan'.tr : 'Buat Target Sekarang'.tr,
+                      style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                   ),
                 ],

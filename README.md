@@ -67,6 +67,11 @@
 - **Ekspor & Impor Database**: Buat salinan cadangan berkas `.ksbackup` (JSON) untuk dipindahkan ke perangkat baru.
 - **Ekspor Laporan Spreadsheet (CSV)**: Unduh seluruh riwayat transaksi untuk dibuka di Microsoft Excel atau Google Sheets.
 
+### 9. 🌐 Master Bahasa & Master Mata Uang
+- **Master Mata Uang**: Pilihan mata uang global lengkap (Rupiah `IDR`, Dolar `USD`, Euro `EUR`, Ringgit `MYR`, Dolar Singapura `SGD`, Yen `JPY`, Pound `GBP`, Riyal `SAR`, Dolar Australia `AUD`), lengkap dengan pratinjau format angka langsung.
+- **Mata Uang Kustom**: Pengguna dapat menambahkan simbol, pemisah ribuan (titik/koma), dan posisi simbol (di depan/di belakang) secara bebas.
+- **Master Bahasa**: Pilihan lokalisasi bahasa aplikasi (*Bahasa Indonesia* dan *English*) yang langsung mengubah format aplikasi secara reaktif.
+
 ---
 
 ## 📱 Tangkapan Layar Navigasi
@@ -165,6 +170,11 @@ lib/
 - **Ekspor & Impor Database**: Buat salinan cadangan berkas `.ksbackup` (JSON) untuk dipindahkan ke perangkat baru.
 - **Ekspor Laporan Spreadsheet (CSV)**: Unduh seluruh riwayat transaksi untuk dibuka di Microsoft Excel atau Google Sheets.
 
+### 9. 🌐 Master Bahasa & Master Mata Uang
+- **Master Mata Uang**: Pilihan mata uang global lengkap (Rupiah `IDR`, Dolar `USD`, Euro `EUR`, Ringgit `MYR`, Dolar Singapura `SGD`, Yen `JPY`, Pound `GBP`, Riyal `SAR`, Dolar Australia `AUD`), lengkap dengan pratinjau format angka langsung.
+- **Mata Uang Kustom**: Pengguna dapat menambahkan simbol, pemisah ribuan (titik/koma), dan posisi simbol (di depan/di belakang) secara bebas.
+- **Master Bahasa**: Pilihan lokalisasi bahasa aplikasi (*Bahasa Indonesia* dan *English*) yang langsung mengubah format aplikasi secara reaktif.
+
 ---
 
 ## 📱 Tangkapan Layar Navigasi
@@ -233,7 +243,7 @@ flutter run
 
 ```bash
 # Rekomendasi: Build APK dengan kompresi per arsitektur (Ukuran ~17 - 19 MB)
-flutter build apk --release --split-per-abi --obfuscate --split-debug-info=build/app/outputs/symbols
+b
 
 # Hasil APK per target:
 # - build/app/outputs/flutter-apk/app-arm64-v8a-release.apk (HP Android modern 64-bit ~19.5 MB)

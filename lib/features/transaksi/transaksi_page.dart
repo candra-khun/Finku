@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../core/format.dart';
+import '../../core/localization.dart';
 import '../../core/widgets.dart';
 import '../../data/models.dart';
 import '../../data/repository.dart';
@@ -105,13 +106,13 @@ class _TransaksiPageState extends State<TransaksiPage>
       case 2:
         return FloatingActionButton(
           onPressed: () => openTxForm(context),
-          tooltip: 'Tambah transaksi',
+          tooltip: 'Tambah transaksi'.tr,
           child: const Icon(Icons.add),
         );
       case 4:
         return FloatingActionButton(
           onPressed: () => showMemoDialog(context),
-          tooltip: 'Tambah memo',
+          tooltip: 'Tambah memo'.tr,
           child: const Icon(Icons.edit_note),
         );
       default:
@@ -123,14 +124,14 @@ class _TransaksiPageState extends State<TransaksiPage>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Transaksi'),
+        title: Text('Transaksi'.tr),
         actions: [
           FutureBuilder<List<RecurringTx>>(
             future: context.watch<Repo>().getDueOrUpcomingReminders(),
             builder: (context, snap) {
               final dueCount = snap.data?.where((i) => i.isOverdue || i.isDueToday).length ?? 0;
               return IconButton(
-                tooltip: 'Transaksi Berulang & Tagihan',
+                tooltip: 'Transaksi Berulang & Tagihan'.tr,
                 icon: Badge(
                   isLabelVisible: dueCount > 0,
                   label: Text('$dueCount'),
@@ -146,7 +147,7 @@ class _TransaksiPageState extends State<TransaksiPage>
             },
           ),
           IconButton(
-            tooltip: 'Anggaran',
+            tooltip: 'Anggaran Bulanan'.tr,
             icon: const Icon(Icons.track_changes_outlined),
             onPressed: () {
               Navigator.push(
@@ -156,7 +157,7 @@ class _TransaksiPageState extends State<TransaksiPage>
             },
           ),
           IconButton(
-            tooltip: 'Cari transaksi',
+            tooltip: 'Cari transaksi'.tr,
             icon: const Icon(Icons.search),
             onPressed: () {
               showSearch(
@@ -170,7 +171,7 @@ class _TransaksiPageState extends State<TransaksiPage>
           controller: _tab,
           isScrollable: true,
           tabAlignment: TabAlignment.start,
-          tabs: [for (final t in _tabs) Tab(text: t)],
+          tabs: [for (final t in _tabs) Tab(text: t.tr)],
         ),
       ),
       floatingActionButton: _fab(),
@@ -242,7 +243,7 @@ class HarianTab extends StatelessWidget {
             const Divider(height: 1),
             Expanded(
               child: items.isEmpty
-                  ? const EmptyState(text: 'Belum ada transaksi bulan ini.\nKetuk + untuk menambah.')
+                  ? EmptyState(text: 'Belum ada transaksi bulan ini.\nKetuk + untuk menambah.'.tr)
                   : ListView(
                       padding: const EdgeInsets.only(bottom: 88),
                       children: groupedTxWidgets(
@@ -297,7 +298,7 @@ class BulananTab extends StatelessWidget {
                       bulan[i],
                       style: TextStyle(color: empty ? muted : null),
                     ),
-                    subtitle: empty ? null : Text('Total ${rupiah(t.total)}'),
+                    subtitle: empty ? null : Text('${'Total'.tr} ${rupiah(t.total)}'),
                     trailing: empty
                         ? Text('-', style: TextStyle(color: muted))
                         : Column(

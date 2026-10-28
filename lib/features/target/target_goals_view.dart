@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../core/format.dart';
+import '../../core/localization.dart';
 import '../../data/models.dart';
 import '../../data/repository.dart';
 import 'goal_card.dart';
@@ -67,13 +68,13 @@ class _TargetGoalsViewState extends State<TargetGoalsView> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Row(
+                          Row(
                             children: [
-                              Icon(Icons.savings_rounded, color: Colors.teal, size: 22),
-                              SizedBox(width: 8),
+                              const Icon(Icons.savings_rounded, color: Colors.teal, size: 22),
+                              const SizedBox(width: 8),
                               Text(
-                                'Total Target Impian',
-                                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                                'Total Target Impian'.tr,
+                                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
                               ),
                             ],
                           ),
@@ -84,7 +85,7 @@ class _TargetGoalsViewState extends State<TargetGoalsView> {
                               borderRadius: BorderRadius.circular(10),
                             ),
                             child: Text(
-                              '$overallPercent% Terkumpul',
+                              '$overallPercent% ${'Terkumpul'.tr}',
                               style: const TextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.bold,
@@ -106,7 +107,7 @@ class _TargetGoalsViewState extends State<TargetGoalsView> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Terkumpul Saat Ini',
+                                'Terkumpul Saat Ini'.tr,
                                 style: TextStyle(fontSize: 11, color: isDark ? Colors.white60 : Colors.black54),
                               ),
                               const SizedBox(height: 2),
@@ -124,7 +125,7 @@ class _TargetGoalsViewState extends State<TargetGoalsView> {
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
                               Text(
-                                'Target Nominal',
+                                'Target Nominal'.tr,
                                 style: TextStyle(fontSize: 11, color: isDark ? Colors.white60 : Colors.black54),
                               ),
                               const SizedBox(height: 2),
@@ -159,14 +160,14 @@ class _TargetGoalsViewState extends State<TargetGoalsView> {
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
                           _miniStat(
-                            label: 'Target Aktif',
+                            label: 'Target Aktif'.tr,
                             value: '${activeGoals.length}',
                             icon: Icons.flag_outlined,
                             color: Colors.teal,
                           ),
                           Container(width: 1, height: 24, color: isDark ? Colors.white12 : Colors.black12),
                           _miniStat(
-                            label: 'Target Tercapai',
+                            label: 'Target Tercapai'.tr,
                             value: '${completedGoals.length}',
                             icon: Icons.check_circle_outline,
                             color: Colors.green,
@@ -185,11 +186,11 @@ class _TargetGoalsViewState extends State<TargetGoalsView> {
                 segments: [
                   ButtonSegment(
                     value: 0,
-                    label: Text('Aktif (${activeGoals.length})'),
+                    label: Text('${'Aktif'.tr} (${activeGoals.length})'),
                   ),
                   ButtonSegment(
                     value: 1,
-                    label: Text('Tercapai / Selesai (${completedGoals.length})'),
+                    label: Text('${'Tercapai / Selesai'.tr} (${completedGoals.length})'),
                   ),
                 ],
                 selected: {_filterIndex},
@@ -264,14 +265,14 @@ class _TargetGoalsViewState extends State<TargetGoalsView> {
           ),
           const SizedBox(height: 12),
           Text(
-            isActiveTab ? 'Belum Ada Target Menabung' : 'Belum Ada Target yang Selesai',
+            isActiveTab ? 'Belum Ada Target Menabung'.tr : 'Belum Ada Target yang Selesai'.tr,
             style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
           ),
           const SizedBox(height: 6),
           Text(
             isActiveTab
-                ? 'Rencanakan impian Anda (Beli Laptop, Dana Darurat, Liburan) dan kumpulkan dana sedikit demi sedikit.'
-                : 'Target yang sudah 100% atau telah Anda tandai selesai akan tersimpan di sini.',
+                ? 'Rencanakan impian Anda (Beli Laptop, Dana Darurat, Liburan) dan kumpulkan dana sedikit demi sedikit.'.tr
+                : 'Target yang sudah 100% atau telah Anda tandai selesai akan tersimpan di sini.'.tr,
             textAlign: TextAlign.center,
             style: const TextStyle(fontSize: 12, color: Colors.grey, height: 1.4),
           ),
@@ -280,7 +281,7 @@ class _TargetGoalsViewState extends State<TargetGoalsView> {
             FilledButton.icon(
               onPressed: () => openGoalForm(context),
               icon: const Icon(Icons.add),
-              label: const Text('Buat Target Sekarang'),
+              label: Text('Buat Target Sekarang'.tr),
             ),
           ],
         ],

@@ -2,6 +2,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 import '../../core/format.dart';
+import '../../core/localization.dart';
 import '../../core/widgets.dart';
 import '../../data/models.dart';
 
@@ -105,10 +106,10 @@ class _TrenBulananViewState extends State<TrenBulananView> {
 
                   // Segmented Pilihan Tampilan Bar
                   SegmentedButton<String>(
-                    segments: const [
-                      ButtonSegment(value: 'both', label: Text('Semua', style: TextStyle(fontSize: 12))),
-                      ButtonSegment(value: 'expense', label: Text('Keluar', style: TextStyle(fontSize: 12))),
-                      ButtonSegment(value: 'income', label: Text('Masuk', style: TextStyle(fontSize: 12))),
+                    segments: [
+                      ButtonSegment(value: 'both', label: Text('Semua'.tr, style: const TextStyle(fontSize: 12))),
+                      ButtonSegment(value: 'expense', label: Text('Keluar'.tr, style: const TextStyle(fontSize: 12))),
+                      ButtonSegment(value: 'income', label: Text('Masuk'.tr, style: const TextStyle(fontSize: 12))),
                     ],
                     selected: {_chartMetric},
                     onSelectionChanged: (set) => setState(() => _chartMetric = set.first),
@@ -131,7 +132,7 @@ class _TrenBulananViewState extends State<TrenBulananView> {
                 children: [
                   Expanded(
                     child: _buildSummaryItem(
-                      label: 'Total Pengeluaran',
+                      label: 'Total Pengeluaran'.tr,
                       amount: rupiah(totalExpense),
                       color: Colors.redAccent,
                       isDark: isDark,
@@ -140,7 +141,7 @@ class _TrenBulananViewState extends State<TrenBulananView> {
                   const SizedBox(width: 10),
                   Expanded(
                     child: _buildSummaryItem(
-                      label: 'Total Pendapatan',
+                      label: 'Total Pendapatan'.tr,
                       amount: rupiah(totalIncome),
                       color: Colors.green,
                       isDark: isDark,
@@ -156,7 +157,7 @@ class _TrenBulananViewState extends State<TrenBulananView> {
                 children: [
                   Expanded(
                     child: _buildSummaryItem(
-                      label: 'Tabungan Bersih',
+                      label: 'Tabungan Bersih'.tr,
                       amount: '${netSavings >= 0 ? '+' : ''}${rupiah(netSavings)}',
                       color: netSavings >= 0 ? Colors.teal : Colors.orangeAccent,
                       isDark: isDark,
@@ -165,7 +166,7 @@ class _TrenBulananViewState extends State<TrenBulananView> {
                   const SizedBox(width: 10),
                   Expanded(
                     child: _buildSummaryItem(
-                      label: 'Rata-rata Keluar / Bln',
+                      label: 'Rata-rata Keluar / Bln'.tr,
                       amount: rupiah(avgExpense),
                       color: theme.colorScheme.primary,
                       isDark: isDark,

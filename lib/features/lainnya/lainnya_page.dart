@@ -2,13 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
+import '../../core/app_settings.dart';
 import '../../core/format.dart';
+import '../../core/localization.dart';
 import '../../core/security_service.dart';
 import '../../data/backup_service.dart';
 import '../../data/repository.dart';
 import '../anggaran/anggaran_page.dart';
 import '../kategori/kelola_kategori_page.dart';
 import '../keamanan/kelola_keamanan_page.dart';
+import '../master/master_bahasa_page.dart';
+import '../master/master_mata_uang_page.dart';
 import '../tag/kelola_tag_page.dart';
 import '../tagihan/tagihan_page.dart';
 import '../target/target_page.dart';
@@ -308,7 +312,7 @@ class _LainnyaPageState extends State<LainnyaPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Lainnya'),
+        title: Text('Lainnya'.tr),
       ),
       body: Stack(
         children: [
@@ -316,7 +320,8 @@ class _LainnyaPageState extends State<LainnyaPage> {
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             children: [
               // ------------------------------------------ CARD 1: BACKUP & RESTORE
-              _sectionTitle('Cadangan & Pemulihan Data', Icons.backup_outlined),
+              _sectionTitle(
+                  'Cadangan & Pemulihan Data'.tr, Icons.backup_outlined),
               Card(
                 elevation: 0,
                 color: isDark ? const Color(0xFF23272F) : Colors.grey.shade100,
@@ -340,7 +345,7 @@ class _LainnyaPageState extends State<LainnyaPage> {
                         onPressed:
                             _isLoading ? null : () => _backupAndShare(service),
                         icon: const Icon(Icons.upload_file),
-                        label: const Text('Cadangkan Data ke File'),
+                        label: Text('Cadangkan Data ke File'.tr),
                         style: FilledButton.styleFrom(
                           minimumSize: const Size.fromHeight(44),
                         ),
@@ -351,16 +356,16 @@ class _LainnyaPageState extends State<LainnyaPage> {
                         onPressed:
                             _isLoading ? null : () => _copyBackupJson(service),
                         icon: const Icon(Icons.copy, size: 18),
-                        label: const Text('Salin Teks Cadangan (JSON)'),
+                        label: Text('Salin Teks Cadangan (JSON)'.tr),
                         style: OutlinedButton.styleFrom(
                           minimumSize: const Size.fromHeight(40),
                         ),
                       ),
                       const Divider(height: 28),
                       // Pemulihan Data
-                      const Text(
-                        'Pulihkan Data dari Cadangan:',
-                        style: TextStyle(
+                      Text(
+                        'Pulihkan Data dari Cadangan:'.tr,
+                        style: const TextStyle(
                             fontSize: 13, fontWeight: FontWeight.w600),
                       ),
                       const SizedBox(height: 10),
@@ -507,7 +512,7 @@ class _LainnyaPageState extends State<LainnyaPage> {
               const SizedBox(height: 24),
 
               // ------------------------------------------ CARD 3: ANGGARAN & TAGIHAN
-              _sectionTitle('Perencanaan Keuangan', Icons.savings_outlined),
+              _sectionTitle('Perencanaan Keuangan'.tr, Icons.savings_outlined),
               Card(
                 elevation: 0,
                 color: isDark ? const Color(0xFF23272F) : Colors.grey.shade100,
@@ -524,10 +529,11 @@ class _LainnyaPageState extends State<LainnyaPage> {
                         child:
                             const Icon(Icons.flag_outlined, color: Colors.teal),
                       ),
-                      title: const Text('Target Menabung (Goals)',
-                          style: TextStyle(fontWeight: FontWeight.w600)),
-                      subtitle: const Text(
-                          'Kumpulkan dana impian, pantau progress, dan alokasi tabungan'),
+                      title: Text('Target Menabung (Goals)'.tr,
+                          style: const TextStyle(fontWeight: FontWeight.w600)),
+                      subtitle: Text(
+                          'Kumpulkan dana impian, pantau progress, dan alokasi tabungan'
+                              .tr),
                       trailing: const Icon(Icons.chevron_right),
                       onTap: () => Navigator.push(
                         context,
@@ -544,10 +550,11 @@ class _LainnyaPageState extends State<LainnyaPage> {
                         child:
                             const Icon(Icons.track_changes, color: Colors.teal),
                       ),
-                      title: const Text('Anggaran Pengeluaran',
-                          style: TextStyle(fontWeight: FontWeight.w600)),
-                      subtitle: const Text(
-                          'Batas pengeluaran per kategori & pantau sisa anggaran bulanan'),
+                      title: Text('Anggaran Pengeluaran'.tr,
+                          style: const TextStyle(fontWeight: FontWeight.w600)),
+                      subtitle: Text(
+                          'Batas pengeluaran per kategori & pantau sisa anggaran bulanan'
+                              .tr),
                       trailing: const Icon(Icons.chevron_right),
                       onTap: () => Navigator.push(
                         context,
@@ -565,10 +572,11 @@ class _LainnyaPageState extends State<LainnyaPage> {
                         child: const Icon(Icons.event_repeat_outlined,
                             color: Colors.orangeAccent),
                       ),
-                      title: const Text('Transaksi Berulang & Tagihan',
-                          style: TextStyle(fontWeight: FontWeight.w600)),
-                      subtitle: const Text(
-                          'Langganan rutin, cicilan, dan pengingat jatuh tempo'),
+                      title: Text('Transaksi Berulang & Tagihan'.tr,
+                          style: const TextStyle(fontWeight: FontWeight.w600)),
+                      subtitle: Text(
+                          'Langganan rutin, cicilan, dan pengingat jatuh tempo'
+                              .tr),
                       trailing: const Icon(Icons.chevron_right),
                       onTap: () => Navigator.push(
                         context,
@@ -582,7 +590,7 @@ class _LainnyaPageState extends State<LainnyaPage> {
               const SizedBox(height: 24),
 
               // ------------------------------------------ CARD 4: KELOLA MASTER DATA
-              _sectionTitle('Kelola Master Data', Icons.tune),
+              _sectionTitle('Kelola Master Data'.tr, Icons.tune),
               Card(
                 elevation: 0,
                 color: isDark ? const Color(0xFF23272F) : Colors.grey.shade100,
@@ -600,10 +608,10 @@ class _LainnyaPageState extends State<LainnyaPage> {
                         child: Icon(Icons.category_outlined,
                             color: theme.colorScheme.primary),
                       ),
-                      title: const Text('Kelola Kategori',
-                          style: TextStyle(fontWeight: FontWeight.w600)),
-                      subtitle: const Text(
-                          'Ubah nama, warna, hapus, dan urutkan kategori'),
+                      title: Text('Kelola Kategori'.tr,
+                          style: const TextStyle(fontWeight: FontWeight.w600)),
+                      subtitle: Text(
+                          'Ubah nama, warna, hapus, dan urutkan kategori'.tr),
                       trailing: const Icon(Icons.chevron_right),
                       onTap: () => Navigator.push(
                         context,
@@ -622,16 +630,66 @@ class _LainnyaPageState extends State<LainnyaPage> {
                         child: Icon(Icons.label_outlined,
                             color: theme.colorScheme.secondary),
                       ),
-                      title: const Text('Kelola Tag',
-                          style: TextStyle(fontWeight: FontWeight.w600)),
-                      subtitle: const Text(
-                          'Ubah nama (koreksi salah ketik) atau hapus tag'),
+                      title: Text('Kelola Tag'.tr,
+                          style: const TextStyle(fontWeight: FontWeight.w600)),
+                      subtitle: Text(
+                          'Ubah nama (koreksi salah ketik) atau hapus tag'.tr),
                       trailing: const Icon(Icons.chevron_right),
                       onTap: () => Navigator.push(
                         context,
                         MaterialPageRoute(
                             builder: (_) => const KelolaTagPage()),
                       ),
+                    ),
+                    Divider(
+                        height: 1,
+                        indent: 64,
+                        color: isDark ? Colors.white12 : Colors.black12),
+                    ListTile(
+                      leading: CircleAvatar(
+                        backgroundColor: Colors.amber.withValues(alpha: 0.15),
+                        child: const Icon(Icons.payments_outlined,
+                            color: Colors.amber),
+                      ),
+                      title: Text('Mata Uang'.tr,
+                          style: const TextStyle(fontWeight: FontWeight.w600)),
+                      subtitle: Text(
+                        '${AppSettings.instance.currency.name} (${AppSettings.instance.currency.symbol})',
+                      ),
+                      trailing: const Icon(Icons.chevron_right),
+                      onTap: () async {
+                        await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (_) => const MasterMataUangPage()),
+                        );
+                        setState(() {});
+                      },
+                    ),
+                    Divider(
+                        height: 1,
+                        indent: 64,
+                        color: isDark ? Colors.white12 : Colors.black12),
+                    ListTile(
+                      leading: CircleAvatar(
+                        backgroundColor: Colors.blue.withValues(alpha: 0.15),
+                        child: const Icon(Icons.translate_outlined,
+                            color: Colors.blue),
+                      ),
+                      title: Text('Bahasa'.tr,
+                          style: const TextStyle(fontWeight: FontWeight.w600)),
+                      subtitle: Text(
+                        '${AppSettings.instance.currentLanguage.flag} ${AppSettings.instance.currentLanguage.name}',
+                      ),
+                      trailing: const Icon(Icons.chevron_right),
+                      onTap: () async {
+                        await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (_) => const MasterBahasaPage()),
+                        );
+                        setState(() {});
+                      },
                     ),
                   ],
                 ),
@@ -640,7 +698,7 @@ class _LainnyaPageState extends State<LainnyaPage> {
               const SizedBox(height: 24),
 
               // ------------------------------------------ CARD 5: KEAMANAN & PRIVASI
-              _sectionTitle('Keamanan & Privasi Data', Icons.security),
+              _sectionTitle('Keamanan & Privasi Data'.tr, Icons.security),
               Card(
                 elevation: 0,
                 color: isDark ? const Color(0xFF23272F) : Colors.grey.shade100,
@@ -665,8 +723,8 @@ class _LainnyaPageState extends State<LainnyaPage> {
                               : Colors.grey,
                         ),
                       ),
-                      title: const Text('Kunci Aplikasi (PIN & Sidik Jari)',
-                          style: TextStyle(fontWeight: FontWeight.w600)),
+                      title: Text('Kunci Aplikasi (PIN & Sidik Jari)'.tr,
+                          style: const TextStyle(fontWeight: FontWeight.w600)),
                       subtitle: Text(
                         SecurityService.instance.isLockEnabled
                             ? (SecurityService.instance.isBiometricEnabled &&

@@ -3,6 +3,8 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:provider/provider.dart';
 
+import 'core/app_settings.dart';
+import 'core/localization.dart';
 import 'core/security_service.dart';
 import 'data/repository.dart';
 import 'features/aset/aset_page.dart';
@@ -14,6 +16,8 @@ import 'features/transaksi/transaksi_page.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initializeDateFormatting('id_ID');
+  await initializeDateFormatting('en_US');
+  await AppSettings.instance.init();
   await SecurityService.instance.init();
   runApp(
     ChangeNotifierProvider(
@@ -30,23 +34,33 @@ class KeuanganApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Finku',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(colorSchemeSeed: _seed, useMaterial3: true),
-      darkTheme: ThemeData(
-        colorSchemeSeed: _seed,
-        brightness: Brightness.dark,
-        useMaterial3: true,
-      ),
-      themeMode: ThemeMode.system,
-      locale: const Locale('id', 'ID'),
-      supportedLocales: const [Locale('id', 'ID')],
-      localizationsDelegates: GlobalMaterialLocalizations.delegates,
-      builder: (context, child) {
-        return SecurityGuard(child: child ?? const SizedBox.shrink());
+    return ListenableBuilder(
+      listenable: AppSettings.instance,
+      builder: (context, _) {
+        final langCode = AppSettings.instance.languageCode;
+        return MaterialApp(
+          key: ValueKey('app_${langCode}_${AppSettings.instance.currency.code}'),
+          title: 'Finku',
+          debugShowCheckedModeBanner: false,
+          theme: ThemeData(colorSchemeSeed: _seed, useMaterial3: true),
+          darkTheme: ThemeData(
+            colorSchemeSeed: _seed,
+            brightness: Brightness.dark,
+            useMaterial3: true,
+          ),
+          themeMode: ThemeMode.system,
+          locale: Locale(langCode, langCode == 'id' ? 'ID' : 'US'),
+          supportedLocales: const [
+            Locale('id', 'ID'),
+            Locale('en', 'US'),
+          ],
+          localizationsDelegates: GlobalMaterialLocalizations.delegates,
+          builder: (context, child) {
+            return SecurityGuard(child: child ?? const SizedBox.shrink());
+          },
+          home: const HomeShell(),
+        );
       },
-      home: const HomeShell(),
     );
   }
 }
@@ -148,26 +162,26 @@ class _HomeShellState extends State<HomeShell> {
       bottomNavigationBar: NavigationBar(
         selectedIndex: _index,
         onDestinationSelected: (i) => setState(() => _index = i),
-        destinations: const [
+        destinations: [
           NavigationDestination(
-            icon: Icon(Icons.receipt_long_outlined),
-            selectedIcon: Icon(Icons.receipt_long),
-            label: 'Transaksi',
+            icon: const Icon(Icons.receipt_long_outlined),
+            selectedIcon: const Icon(Icons.receipt_long),
+            label: 'Transaksi'.tr,
           ),
           NavigationDestination(
-            icon: Icon(Icons.pie_chart_outline),
-            selectedIcon: Icon(Icons.pie_chart),
-            label: 'Statistik',
+            icon: const Icon(Icons.pie_chart_outline),
+            selectedIcon: const Icon(Icons.pie_chart),
+            label: 'Statistik'.tr,
           ),
           NavigationDestination(
-            icon: Icon(Icons.account_balance_wallet_outlined),
-            selectedIcon: Icon(Icons.account_balance_wallet),
-            label: 'Aset',
+            icon: const Icon(Icons.account_balance_wallet_outlined),
+            selectedIcon: const Icon(Icons.account_balance_wallet),
+            label: 'Aset'.tr,
           ),
           NavigationDestination(
-            icon: Icon(Icons.more_horiz_outlined),
-            selectedIcon: Icon(Icons.more_horiz),
-            label: 'Lainnya',
+            icon: const Icon(Icons.more_horiz_outlined),
+            selectedIcon: const Icon(Icons.more_horiz),
+            label: 'Lainnya'.tr,
           ),
         ],
       ),

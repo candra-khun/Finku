@@ -438,13 +438,15 @@ class _TagihanFormPageState extends State<TagihanFormPage> {
             const SizedBox(height: 24),
 
             // Tombol Simpan
-            FilledButton.icon(
+            FilledButton(
               onPressed: _save,
-              icon: const Icon(Icons.check),
-              label: Text(widget.initial == null ? 'Simpan Transaksi Berulang' : 'Perbarui Transaksi Berulang'),
               style: FilledButton.styleFrom(
                 minimumSize: const Size.fromHeight(48),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              ),
+              child: Text(
+                widget.initial == null ? 'Simpan Transaksi Berulang' : 'Perbarui Transaksi Berulang',
+                style: const TextStyle(fontWeight: FontWeight.bold),
               ),
             ),
             const SizedBox(height: 32),

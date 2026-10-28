@@ -2,7 +2,9 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../core/app_settings.dart';
 import '../../core/format.dart';
+import '../../core/localization.dart';
 import '../../core/widgets.dart';
 import '../../data/models.dart';
 import '../../data/repository.dart';
@@ -68,12 +70,20 @@ class _StatistikPageState extends State<StatistikPage> {
   int? _filterTagId;
   String? _filterTagName;
 
-  static const _modeLabels = {
+  static const _modeLabelsId = {
     StatMode.month: 'Bulanan',
     StatMode.week: 'Mingguan',
     StatMode.year: 'Tahunan',
     StatMode.range: 'Periode',
   };
+  static const _modeLabelsEn = {
+    StatMode.month: 'Monthly',
+    StatMode.week: 'Weekly',
+    StatMode.year: 'Yearly',
+    StatMode.range: 'Range',
+  };
+  Map<StatMode, String> get _modeLabels =>
+      AppSettings.instance.isEnglish ? _modeLabelsEn : _modeLabelsId;
 
   StatPeriod get _period {
     final a = _anchor;
@@ -398,16 +408,16 @@ class _StatistikPageState extends State<StatistikPage> {
     return Padding(
       padding: const EdgeInsets.only(left: 16, right: 16, top: 8, bottom: 4),
       child: SegmentedButton<int>(
-        segments: const [
+        segments: [
           ButtonSegment(
             value: 0,
-            icon: Icon(Icons.pie_chart_outline, size: 16),
-            label: Text('Kategori'),
+            icon: const Icon(Icons.pie_chart_outline, size: 16),
+            label: Text('Kategori'.tr),
           ),
           ButtonSegment(
             value: 1,
-            icon: Icon(Icons.bar_chart_outlined, size: 16),
-            label: Text('Tren Bulanan'),
+            icon: const Icon(Icons.bar_chart_outlined, size: 16),
+            label: Text('Tren Bulanan'.tr),
           ),
         ],
         selected: {_subTab},
@@ -569,14 +579,14 @@ class _StatistikPageState extends State<StatistikPage> {
                             Row(
                               children: [
                                 _tabButton(
-                                  label: 'Pendapatan',
+                                  label: 'Pendapatan'.tr,
                                   amount: '${rupiah(totals.income)},00',
                                   isSelected: _selectedType == 'income',
                                   onTap: () =>
                                       setState(() => _selectedType = 'income'),
                                 ),
                                 _tabButton(
-                                  label: 'Pengeluaran',
+                                  label: 'Pengeluaran'.tr,
                                   amount: '${rupiah(totals.expense)},00',
                                   isSelected: _selectedType == 'expense',
                                   onTap: () =>
@@ -597,10 +607,10 @@ class _StatistikPageState extends State<StatistikPage> {
                                       child: Text(
                                         (_filterAssetId != null ||
                                                 _filterTagId != null)
-                                            ? 'Tidak ada transaksi untuk filter yang dipilih.'
+                                            ? 'Tidak ada transaksi untuk filter yang dipilih.'.tr
                                             : (_selectedType == 'income'
-                                                ? 'Belum ada pendapatan pada periode ini.'
-                                                : 'Belum ada pengeluaran pada periode ini.'),
+                                                ? 'Belum ada pendapatan pada periode ini.'.tr
+                                                : 'Belum ada pengeluaran pada periode ini.'.tr),
                                         style: TextStyle(
                                           color:
                                               textColor.withValues(alpha: 0.5),

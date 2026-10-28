@@ -1,5 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:keuangan_saku/core/app_settings.dart';
 import 'package:keuangan_saku/core/format.dart';
+import 'package:keuangan_saku/core/localization.dart';
 import 'package:keuangan_saku/data/models.dart';
 
 void main() {
@@ -124,5 +126,46 @@ void main() {
     expect(goalOverdue.isCompleted, false);
     expect(goalOverdue.progressPercent, 95);
     expect(goalOverdue.daysRemaining! < 0, true);
+  });
+
+  test('master bahasa dan mata uang', () async {
+    final settings = AppSettings.instance;
+    // Default currency IDR
+    expect(settings.currency.code, 'IDR');
+    expect(settings.formatMoney(1500000), 'Rp 1.500.000');
+    expect(settings.formatMoney(-2500), '-Rp 2.500');
+
+    // Test ganti mata uang ke USD
+    const usd = CurrencyModel(
+      code: 'USD',
+      name: 'US Dollar',
+      symbol: '\$',
+      isPrefix: true,
+      thousandSep: ',',
+      decimalSep: '.',
+    );
+    settings.setCurrency(usd);
+    expect(settings.formatMoney(1500000), '\$ 1,500,000');
+    expect(settings.formatMoney(-2500), '-\$ 2,500');
+
+    // Kembalikan ke default IDR
+    settings.setCurrency(AppSettings.defaultCurrencies.first);
+    expect(settings.formatMoney(1500000), 'Rp 1.500.000');
+
+    // Test ganti bahasa & lokalisasi
+    await settings.setLanguage('id');
+    expect('Transaksi'.tr, 'Transaksi');
+    expect('Pengeluaran'.tr, 'Pengeluaran');
+    expect(periodLabel('2026-10'), 'Oktober 2026');
+    expect(namaHari(DateTime(2026, 10, 27)), 'Selasa');
+
+    await settings.setLanguage('en');
+    expect('Transaksi'.tr, 'Transactions');
+    expect('Pengeluaran'.tr, 'Expense');
+    expect(periodLabel('2026-10'), 'October 2026');
+    expect(namaHari(DateTime(2026, 10, 27)), 'Tuesday');
+
+    // Kembalikan ke id
+    await settings.setLanguage('id');
   });
 }

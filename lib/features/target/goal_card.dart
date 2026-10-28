@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../../core/dialogs.dart';
 import '../../core/format.dart';
+import '../../core/localization.dart';
 import '../../data/models.dart';
 import '../../data/repository.dart';
 import 'alokasi_dialog.dart';
@@ -128,9 +129,9 @@ class GoalCard extends StatelessWidget {
                       } else if (val == 'delete') {
                         final ok = await confirm(
                           context,
-                          title: 'Hapus Target?',
+                          title: 'Hapus Target?'.tr,
                           message: 'Target "${goal.title}" akan dihapus permanen.',
-                          okLabel: 'Hapus',
+                          okLabel: 'Hapus'.tr,
                         );
                         if (ok) {
                           await repo.deleteSavingsGoal(goal.id);
@@ -138,34 +139,34 @@ class GoalCard extends StatelessWidget {
                       }
                     },
                     itemBuilder: (ctx) => [
-                      const PopupMenuItem(
+                      PopupMenuItem(
                         value: 'edit',
                         child: Row(
                           children: [
-                            Icon(Icons.edit_outlined, size: 18),
-                            SizedBox(width: 8),
-                            Text('Ubah Target'),
+                            const Icon(Icons.edit_outlined, size: 18),
+                            const SizedBox(width: 8),
+                            Text('Ubah Target'.tr),
                           ],
                         ),
                       ),
-                      const PopupMenuItem(
+                      PopupMenuItem(
                         value: 'deadline',
                         child: Row(
                           children: [
-                            Icon(Icons.timer_outlined, size: 18, color: Colors.blue),
-                            SizedBox(width: 8),
-                            Text('Pilihan Batas Waktu'),
+                            const Icon(Icons.timer_outlined, size: 18, color: Colors.blue),
+                            const SizedBox(width: 8),
+                            Text('Pilihan Batas Waktu'.tr),
                           ],
                         ),
                       ),
                       if (goal.currentAmount > 0)
-                        const PopupMenuItem(
+                        PopupMenuItem(
                           value: 'transfer',
                           child: Row(
                             children: [
-                              Icon(Icons.swap_horiz, size: 18, color: Colors.purple),
-                              SizedBox(width: 8),
-                              Text('Pindahkan Saldo'),
+                              const Icon(Icons.swap_horiz, size: 18, color: Colors.purple),
+                              const SizedBox(width: 8),
+                              Text('Pindahkan Saldo'.tr),
                             ],
                           ),
                         ),
@@ -179,18 +180,18 @@ class GoalCard extends StatelessWidget {
                               color: isCompleted ? Colors.orange : Colors.teal,
                             ),
                             const SizedBox(width: 8),
-                            Text(isCompleted ? 'Buka Kembali' : 'Tandai Selesai'),
+                            Text(isCompleted ? 'Buka Kembali'.tr : 'Tandai Selesai'.tr),
                           ],
                         ),
                       ),
                       const PopupMenuDivider(),
-                      const PopupMenuItem(
+                      PopupMenuItem(
                         value: 'delete',
                         child: Row(
                           children: [
-                            Icon(Icons.delete_outline, size: 18, color: Colors.redAccent),
-                            SizedBox(width: 8),
-                            Text('Hapus', style: TextStyle(color: Colors.redAccent)),
+                            const Icon(Icons.delete_outline, size: 18, color: Colors.redAccent),
+                            const SizedBox(width: 8),
+                            Text('Hapus'.tr, style: const TextStyle(color: Colors.redAccent)),
                           ],
                         ),
                       ),
@@ -237,7 +238,7 @@ class GoalCard extends StatelessWidget {
                       borderRadius: BorderRadius.circular(6),
                     ),
                     child: Text(
-                      isCompleted ? 'Tercapai 🎉' : '$percent%',
+                      isCompleted ? 'Tercapai 🎉'.tr : '$percent%',
                       style: TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.bold,
@@ -287,11 +288,11 @@ class GoalCard extends StatelessWidget {
                       ),
                       InkWell(
                         onTap: () => showDeadlineOptionsDialog(context, goal),
-                        child: const Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
                           child: Text(
-                            'Pilihan',
-                            style: TextStyle(
+                            'Pilihan'.tr,
+                            style: const TextStyle(
                               fontSize: 11,
                               fontWeight: FontWeight.bold,
                               color: Colors.redAccent,
@@ -310,8 +311,8 @@ class GoalCard extends StatelessWidget {
                   children: [
                     Text(
                       isCompleted
-                          ? 'Target berhasil dipenuhi 100%!'
-                          : 'Kurang ${rupiah(goal.remainingAmount)} lagi',
+                          ? 'Target berhasil dipenuhi 100%!'.tr
+                          : '${'Kurang'.tr} ${rupiah(goal.remainingAmount)} lagi',
                       style: TextStyle(
                         fontSize: 11,
                         color: isCompleted ? Colors.green : (isDark ? Colors.white60 : Colors.black54),
@@ -341,7 +342,7 @@ class GoalCard extends StatelessWidget {
                       ),
                       onPressed: () => showTarikDanaDialog(context, goal),
                       icon: const Icon(Icons.remove, size: 14),
-                      label: const Text('Tarik', style: TextStyle(fontSize: 12)),
+                      label: Text('Tarik'.tr, style: const TextStyle(fontSize: 12)),
                     ),
                     const SizedBox(width: 8),
                   ],
@@ -354,7 +355,7 @@ class GoalCard extends StatelessWidget {
                     ),
                     onPressed: () => showAlokasiDanaDialog(context, goal),
                     icon: const Icon(Icons.add, size: 14),
-                    label: const Text('Menabung', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                    label: Text('Menabung'.tr, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
                   ),
                 ],
               ),

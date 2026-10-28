@@ -1,10 +1,12 @@
 import 'package:flutter/services.dart';
 
+import 'app_settings.dart';
+
 const Color incomeColor = Color(0xFF1E88E5);
 const Color expenseColor = Color(0xFFE53935);
 const Color transferColor = Color(0xFF757575);
 
-const List<String> bulan = [
+const List<String> bulanId = [
   'Januari',
   'Februari',
   'Maret',
@@ -19,7 +21,22 @@ const List<String> bulan = [
   'Desember',
 ];
 
-const List<String> bulanPendek = [
+const List<String> bulanEn = [
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December',
+];
+
+const List<String> bulanPendekId = [
   'Jan',
   'Feb',
   'Mar',
@@ -34,7 +51,22 @@ const List<String> bulanPendek = [
   'Des',
 ];
 
-const List<String> hari = [
+const List<String> bulanPendekEn = [
+  'Jan',
+  'Feb',
+  'Mar',
+  'Apr',
+  'May',
+  'Jun',
+  'Jul',
+  'Aug',
+  'Sep',
+  'Oct',
+  'Nov',
+  'Dec',
+];
+
+const List<String> hariId = [
   'Senin',
   'Selasa',
   'Rabu',
@@ -44,28 +76,26 @@ const List<String> hari = [
   'Minggu',
 ];
 
-/// Format Rupiah: 1500000 -> "Rp 1.500.000", -2500 -> "-Rp 2.500".
-String rupiah(int value) {
-  final negative = value < 0;
-  final digits = value.abs().toString();
-  final buffer = StringBuffer();
-  for (var i = 0; i < digits.length; i++) {
-    if (i > 0 && (digits.length - i) % 3 == 0) buffer.write('.');
-    buffer.write(digits[i]);
-  }
-  return '${negative ? '-' : ''}Rp $buffer';
-}
+const List<String> hariEn = [
+  'Monday',
+  'Tuesday',
+  'Wednesday',
+  'Thursday',
+  'Friday',
+  'Saturday',
+  'Sunday',
+];
+
+List<String> get bulan => AppSettings.instance.isEnglish ? bulanEn : bulanId;
+List<String> get bulanPendek =>
+    AppSettings.instance.isEnglish ? bulanPendekEn : bulanPendekId;
+List<String> get hari => AppSettings.instance.isEnglish ? hariEn : hariId;
+
+/// Format Uang / Mata Uang (sebelumnya rupiah): 1500000 -> "Rp 1.500.000", -2500 -> "-Rp 2.500".
+String rupiah(int value) => AppSettings.instance.formatMoney(value);
 
 /// Format ringkas untuk sel kalender: 1500000 -> "1,5jt", 25000 -> "25rb".
-String ringkas(int value) {
-  if (value >= 1000000) {
-    final v = value / 1000000;
-    final s = v.toStringAsFixed(1).replaceAll('.', ',');
-    return '${s.endsWith(',0') ? s.substring(0, s.length - 2) : s}jt';
-  }
-  if (value >= 1000) return '${value ~/ 1000}rb';
-  return value.toString();
-}
+String ringkas(int value) => AppSettings.instance.formatCompact(value);
 
 String ymd(DateTime d) =>
     '${d.year.toString().padLeft(4, '0')}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
@@ -94,16 +124,8 @@ DateTime firstOfMonth(DateTime d) => DateTime(d.year, d.month, 1);
 
 DateTime lastOfMonth(DateTime d) => DateTime(d.year, d.month + 1, 0);
 
-/// Format angka dengan pemisah ribuan titik (1500000 -> "1.500.000").
-String formatRibuan(int value) {
-  final digits = value.abs().toString();
-  final buffer = StringBuffer();
-  for (var i = 0; i < digits.length; i++) {
-    if (i > 0 && (digits.length - i) % 3 == 0) buffer.write('.');
-    buffer.write(digits[i]);
-  }
-  return buffer.toString();
-}
+/// Format angka dengan pemisah ribuan dinamis sesuai mata uang aktif (1500000 -> "1.500.000").
+String formatRibuan(int value) => AppSettings.instance.formatNumber(value);
 
 /// Parse string berpemisah titik kembali ke integer ("1.500.000" -> 1500000).
 int parseRibuan(String text) {

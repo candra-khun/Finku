@@ -1,3 +1,4 @@
+import '../core/app_settings.dart';
 import '../core/format.dart';
 
 class AssetGroup {
@@ -451,17 +452,18 @@ class SavingsGoal {
   }
 
   String get deadlineStatusLabel {
-    if (targetDate == null) return 'Tanpa batas waktu';
+    final isEn = AppSettings.instance.isEnglish;
+    if (targetDate == null) return isEn ? 'No deadline' : 'Tanpa batas waktu';
     final days = daysRemaining!;
-    if (isCompleted) return 'Target Tercapai! 🎉';
-    if (days < 0) return 'Batas waktu lewat ${-days} hari';
-    if (days == 0) return 'Hari ini batas waktu terakhir!';
-    if (days == 1) return 'Sisa 1 hari lagi';
-    if (days < 30) return 'Sisa $days hari lagi';
+    if (isCompleted) return isEn ? 'Goal Reached! 🎉' : 'Target Tercapai! 🎉';
+    if (days < 0) return isEn ? '${-days} days overdue' : 'Batas waktu lewat ${-days} hari';
+    if (days == 0) return isEn ? 'Due today!' : 'Hari ini batas waktu terakhir!';
+    if (days == 1) return isEn ? '1 day left' : 'Sisa 1 hari lagi';
+    if (days < 30) return isEn ? '$days days left' : 'Sisa $days hari lagi';
     final months = (days / 30).floor();
     final remDays = days % 30;
-    if (remDays == 0) return 'Sisa $months bulan lagi';
-    return 'Sisa $months bln $remDays hari';
+    if (remDays == 0) return isEn ? '$months months left' : 'Sisa $months bulan lagi';
+    return isEn ? '$months mo $remDays days left' : 'Sisa $months bln $remDays hari';
   }
 
   factory SavingsGoal.fromMap(Map<String, Object?> m) {

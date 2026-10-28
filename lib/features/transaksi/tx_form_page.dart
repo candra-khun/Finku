@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
+import '../../core/app_settings.dart';
 import '../../core/dialogs.dart';
 import '../../core/format.dart';
+import '../../core/localization.dart';
 import '../../data/models.dart';
 import '../../data/repository.dart';
 import '../kategori/kelola_kategori_page.dart';
@@ -197,9 +199,9 @@ class _TxFormPageState extends State<TxFormPage> {
   Future<void> _delete() async {
     final ok = await confirm(
       context,
-      title: 'Hapus transaksi?',
-      message: 'Transaksi ini akan dihapus dan saldo aset disesuaikan.',
-      okLabel: 'Hapus',
+      title: 'Hapus transaksi?'.tr,
+      message: 'Transaksi ini akan dihapus dan saldo aset disesuaikan.'.tr,
+      okLabel: 'Hapus'.tr,
     );
     if (!ok) return;
     final repo = context.read<Repo>();
@@ -222,7 +224,7 @@ class _TxFormPageState extends State<TxFormPage> {
     final isTransfer = _type == 'transfer';
     return Scaffold(
       appBar: AppBar(
-        title: Text(isEdit ? 'Ubah transaksi' : 'Tambah transaksi'),
+        title: Text(isEdit ? 'Ubah transaksi'.tr : 'Tambah transaksi'.tr),
         actions: [
           if (isEdit) ...[
             IconButton(
@@ -234,12 +236,12 @@ class _TxFormPageState extends State<TxFormPage> {
                 );
               },
               icon: const Icon(Icons.copy_outlined),
-              tooltip: 'Duplikat transaksi',
+              tooltip: 'Duplikat transaksi'.tr,
             ),
             IconButton(
               onPressed: _delete,
               icon: const Icon(Icons.delete_outline),
-              tooltip: 'Hapus',
+              tooltip: 'Hapus'.tr,
             ),
           ],
         ],
@@ -252,11 +254,11 @@ class _TxFormPageState extends State<TxFormPage> {
                 padding: const EdgeInsets.all(16),
                 children: [
                   SegmentedButton<String>(
-                    segments: const [
-                      ButtonSegment(value: 'income', label: Text('Pendapatan')),
+                    segments: [
+                      ButtonSegment(value: 'income', label: Text('Pendapatan'.tr)),
                       ButtonSegment(
-                          value: 'expense', label: Text('Pengeluaran')),
-                      ButtonSegment(value: 'transfer', label: Text('Transfer')),
+                          value: 'expense', label: Text('Pengeluaran'.tr)),
+                      ButtonSegment(value: 'transfer', label: Text('Transfer'.tr)),
                     ],
                     selected: {_type},
                     onSelectionChanged: (s) => _changeType(s.first),
@@ -266,10 +268,10 @@ class _TxFormPageState extends State<TxFormPage> {
                   InkWell(
                     onTap: _pickDate,
                     child: InputDecorator(
-                      decoration: const InputDecoration(
-                        labelText: 'Tanggal',
-                        border: OutlineInputBorder(),
-                        suffixIcon: Icon(Icons.calendar_today_outlined),
+                      decoration: InputDecoration(
+                        labelText: 'Tanggal'.tr,
+                        border: const OutlineInputBorder(),
+                        suffixIcon: const Icon(Icons.calendar_today_outlined),
                       ),
                       child: Text('${namaHari(_date)}, ${tglPanjang(_date)}'),
                     ),
@@ -282,10 +284,10 @@ class _TxFormPageState extends State<TxFormPage> {
                       FilteringTextInputFormatter.digitsOnly,
                       ThousandsSeparatorInputFormatter(),
                     ],
-                    decoration: const InputDecoration(
-                      labelText: 'Total',
-                      prefixText: 'Rp ',
-                      border: OutlineInputBorder(),
+                    decoration: InputDecoration(
+                      labelText: 'Total'.tr,
+                      prefixText: '${AppSettings.instance.currency.symbol} ',
+                      border: const OutlineInputBorder(),
                     ),
                     validator: (v) {
                       final n = parseRibuan(v ?? '');
@@ -299,13 +301,13 @@ class _TxFormPageState extends State<TxFormPage> {
                       key: ValueKey('cat-$_type-$_reset'),
                       initialValue: _categoryId,
                       isExpanded: true,
-                      decoration: const InputDecoration(
-                          labelText: 'Kategori', border: OutlineInputBorder()),
+                      decoration: InputDecoration(
+                          labelText: 'Kategori'.tr, border: const OutlineInputBorder()),
                       items: [
                         for (final c in _cats)
                           DropdownMenuItem(value: c.id, child: Text(c.name)),
-                        const DropdownMenuItem(
-                            value: -1, child: Text('+ Tambah kategori baru')),
+                        DropdownMenuItem(
+                            value: -1, child: Text('+ ${'Tambah kategori baru'.tr}')),
                         const DropdownMenuItem(
                             value: -2, child: Text('⚙ Kelola kategori...')),
                       ],
@@ -337,12 +339,12 @@ class _TxFormPageState extends State<TxFormPage> {
                           setState(() => _categoryId = v);
                         }
                       },
-                      validator: (v) => v == null ? 'Pilih kategori' : null,
+                      validator: (v) => v == null ? 'Pilih kategori'.tr : null,
                     ),
                     const SizedBox(height: 16),
                   ],
                   _assetDropdown(
-                    label: isTransfer ? 'Dari aset' : 'Aset',
+                    label: isTransfer ? 'Dari aset'.tr : 'Aset'.tr,
                     value: _assetId,
                     target: 'from',
                     onSelected: (v) => setState(() => _assetId = v),
@@ -350,13 +352,13 @@ class _TxFormPageState extends State<TxFormPage> {
                   if (isTransfer) ...[
                     const SizedBox(height: 16),
                     _assetDropdown(
-                      label: 'Ke aset',
+                      label: 'Ke aset'.tr,
                       value: _toAssetId,
                       target: 'to',
                       onSelected: (v) => setState(() => _toAssetId = v),
                       validator: (v) {
-                        if (v == null) return 'Pilih aset';
-                        if (v == _assetId) return 'Aset tujuan harus berbeda';
+                        if (v == null) return 'Pilih aset'.tr;
+                        if (v == _assetId) return 'Aset tujuan harus berbeda'.tr;
                         return null;
                       },
                     ),
@@ -365,11 +367,11 @@ class _TxFormPageState extends State<TxFormPage> {
                   TextFormField(
                     controller: _note,
                     textCapitalization: TextCapitalization.sentences,
-                    decoration: const InputDecoration(
-                        labelText: 'Catatan', border: OutlineInputBorder()),
+                    decoration: InputDecoration(
+                        labelText: 'Catatan'.tr, border: const OutlineInputBorder()),
                   ),
                   const SizedBox(height: 16),
-                  Text('Tag', style: Theme.of(context).textTheme.labelLarge),
+                  Text('Tag'.tr, style: Theme.of(context).textTheme.labelLarge),
                   const SizedBox(height: 8),
                   Wrap(
                     spacing: 8,
@@ -389,7 +391,7 @@ class _TxFormPageState extends State<TxFormPage> {
                         ),
                       ActionChip(
                         avatar: const Icon(Icons.add, size: 18),
-                        label: const Text('Tambah tag'),
+                        label: Text('Tambah tag'.tr),
                         onPressed: _addTag,
                       ),
                     ],
@@ -400,17 +402,22 @@ class _TxFormPageState extends State<TxFormPage> {
                     minLines: 3,
                     maxLines: 6,
                     textCapitalization: TextCapitalization.sentences,
-                    decoration: const InputDecoration(
-                      labelText: 'Deskripsi',
+                    decoration: InputDecoration(
+                      labelText: 'Deskripsi'.tr,
                       alignLabelWithHint: true,
-                      border: OutlineInputBorder(),
+                      border: const OutlineInputBorder(),
                     ),
                   ),
                   const SizedBox(height: 24),
-                  FilledButton.icon(
+                  FilledButton(
                     onPressed: _save,
-                    icon: const Icon(Icons.check),
-                    label: Text(isEdit ? 'Simpan perubahan' : 'Simpan'),
+                    style: FilledButton.styleFrom(
+                      minimumSize: const Size.fromHeight(48),
+                    ),
+                    child: Text(
+                      isEdit ? 'Simpan perubahan'.tr : 'Simpan'.tr,
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
                   ),
                 ],
               ),
@@ -434,7 +441,7 @@ class _TxFormPageState extends State<TxFormPage> {
       items: [
         for (final a in _assets)
           DropdownMenuItem(value: a.id, child: Text(a.name)),
-        const DropdownMenuItem(value: -1, child: Text('+ Tambah aset baru')),
+        DropdownMenuItem(value: -1, child: Text('+ Tambah aset baru'.tr)),
       ],
       onChanged: (v) {
         if (v == -1) {

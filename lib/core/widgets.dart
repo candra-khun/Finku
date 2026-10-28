@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../data/models.dart';
 import '../data/repository.dart';
 import 'format.dart';
+import 'localization.dart';
 
 /// Memuat data dari Repo dan memuat ulang otomatis setiap kali data berubah
 /// atau [keyValue] berganti. Data lama tetap tampil selama memuat ulang,
@@ -91,9 +92,9 @@ class SummaryBar extends StatelessWidget {
       color: Theme.of(context).colorScheme.surface,
       child: Row(
         children: [
-          _cell(context, 'Pendapatan', rupiah(income), incomeColor),
-          _cell(context, 'Pengeluaran', rupiah(expense), expenseColor),
-          _cell(context, 'Total', rupiah(total),
+          _cell(context, 'Pendapatan'.tr, rupiah(income), incomeColor),
+          _cell(context, 'Pengeluaran'.tr, rupiah(expense), expenseColor),
+          _cell(context, 'Total'.tr, rupiah(total),
               total < 0 ? expenseColor : Theme.of(context).colorScheme.onSurface),
         ],
       ),
