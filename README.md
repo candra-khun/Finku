@@ -18,15 +18,15 @@
 
 ---
 
-## 📌 Tentang Finku
+## Tentang Finku
 
 **Finku** (*Financial-ku*) adalah aplikasi manajer keuangan pribadi berbasis Flutter yang dirancang untuk membantu pencatatan arus kas harian, perencanaan anggaran bulanan, pemantauan saldo aset/rekening, serta analisis statistik pengeluaran secara akurat dan mudah. Seluruh data tersimpan secara lokal di perangkat Anda (tanpa perlu server luar) sehingga privasi keuangan Anda terjamin.
 
 ---
 
-## ✨ Fitur Utama
+## Fitur Utama
 
-### 1. 📝 Kelola Transaksi (Arus Kas)
+### 1. Kelola Transaksi (Arus Kas)
 - **Multi Tampilan**: Pantau catatan transaksi secara **Harian**, **Kalender**, **Bulanan**, maupun catatan khusus **Memo**.
 - **Pencarian & Filter Cepat**: Temukan transaksi berdasarkan kata kunci catatan/kategori secara instan.
 - **Pemisah Ribuan Otomatis**: Input nominal dengan format Rupiah yang nyaman dan rapi tanpa ribet mengetik titik atau koma manual.
@@ -34,47 +34,45 @@
 - **Transfer Antarakun**: Catat perpindahan dana antar rekening/aset secara akurat.
 - **Tutup Buku Bulanan**: Kunci catatan keuangan periode lalu agar tidak berubah tanpa sengaja.
 
-### 2. 📊 Statistik & Grafik Finansial
+### 2. Statistik & Grafik Finansial
 - **Diagram Lingkaran Interaktif (Pie Chart)**: Visualisasi proporsi pengeluaran dan pemasukan per kategori beserta persentase kontribusinya.
 - **Grafik Tren Bulanan**: Bar chart komparasi 12 bulan (Januari–Desember) untuk melihat tren pengeluaran vs pemasukan tahunan.
 - **Filter Statistik Mendalam**: Analisis pengeluaran yang dapat difilter per **Akun Aset** atau per **Tag** tertentu.
 
-### 3. 🎯 Anggaran per Kategori (Budgeting)
+### 3. Anggaran per Kategori (Budgeting)
 - Tetapkan batas anggaran pengeluaran bulanan per kategori (misal: *Makanan Rp 2.000.000/bulan*).
 - Indikator progres visual interaktif: persentase pemakaian, sisa anggaran riil, serta tanda bahaya ketika mendekati atau melebihi batas (*overbudget*).
 
-### 4. 🎯 Target Menabung (Savings Goals)
+### 4. Target Menabung (Savings Goals)
 - **Kumpulkan Dana Impian**: Rencanakan tujuan menabung spesifik (contoh: *Beli Laptop Rp 5.000.000*, *Dana Darurat Rp 10.000.000*, *Target Tabungan Bulan Ini Rp 2.000.000*).
 - **Progres Visual & Deadline**: Batang kemajuan (*progress bar*) otomatis, persentase ketercapaian, sisa kekurangan dana, dan sisa hari menuju batas waktu (*deadline*).
 - **Pilihan Batas Waktu Cerdas**: Saat deadline berakhir sebelum 100% tercapai, pengguna dapat memperpanjang waktu, menutup/menyelesaikan target dengan nominal saat ini, atau memindahkan sisa saldo ke target lain.
 - **Alokasi Dana Terintegrasi**: Setor dana langsung dari akun aset (dengan opsi memotong saldo arus kas atau alokasi virtual), tarik dana, maupun transfer saldo antar-target tanpa perlu mencatat ganda.
 
-### 5. 🔁 Transaksi Berulang & Pengingat Tagihan
+### 5. Transaksi Berulang & Pengingat Tagihan
 - Jadwalkan pembayaran rutin (Harian, Mingguan, Bulanan, Tahunan) untuk sewa, langganan, internet, listrik, gaji, dll.
 - Opsi otomatisasi pencatatan saat jatuh tempo tiba dan pengingat tagihan aktif.
 
-### 6. 💼 Pengelompokan & Manajemen Akun Aset
+### 6. Pengelompokan & Manajemen Akun Aset
 - Tab terpadu di menu Aset: **Daftar Aset** dan **Target Menabung**.
 - Kelompokkan aset keuangan: Kas/Tunai, Rekening Bank, Dompet Digital (*E-Wallet*), Kartu Kredit, hingga Investasi.
 - Urutkan dan kelola master data **Kategori** (pemasukan/pengeluaran) serta **Tag** transaksi sesuai kebutuhan pribadi Anda.
 
-### 7. 🔒 Keamanan & Privasi
+### 7. Keamanan & Privasi
 - **Kunci Aplikasi dengan PIN 6 Digit**: Dilengkapi enkripsi *hashing* SHA-256 + *cryptographic salt*.
 - **Autentikasi Biometrik**: Buka kunci dengan cepat menggunakan Sidik Jari (*Fingerprint*) atau Pemindai Wajah (*Face ID*).
 - **Auto-Lock Timeout**: Pengaturan penguncian otomatis (Langsung saat keluar, 1 menit, atau 5 menit).
 
-### 8. 💾 Cadangkan & Pulihkan Data (Backup & Restore)
+### 8. Cadangkan & Pulihkan Data (Backup & Restore)
 - **Ekspor & Impor Database**: Buat salinan cadangan berkas `.ksbackup` (JSON) untuk dipindahkan ke perangkat baru.
 - **Ekspor Laporan Spreadsheet (CSV)**: Unduh seluruh riwayat transaksi untuk dibuka di Microsoft Excel atau Google Sheets.
 
-### 9. 🌐 Master Bahasa & Master Mata Uang
-- **Master Mata Uang**: Pilihan mata uang global lengkap (Rupiah `IDR`, Dolar `USD`, Euro `EUR`, Ringgit `MYR`, Dolar Singapura `SGD`, Yen `JPY`, Pound `GBP`, Riyal `SAR`, Dolar Australia `AUD`), lengkap dengan pratinjau format angka langsung.
-- **Mata Uang Kustom**: Pengguna dapat menambahkan simbol, pemisah ribuan (titik/koma), dan posisi simbol (di depan/di belakang) secara bebas.
+### 9. Master Bahasa 
 - **Master Bahasa**: Pilihan lokalisasi bahasa aplikasi (*Bahasa Indonesia* dan *English*) yang langsung mengubah format aplikasi secara reaktif.
 
 ---
 
-## 📱 Tangkapan Layar Navigasi
+## Tangkapan Layar Navigasi
 
 Finku terbagi ke dalam 4 modul utama pada menu navigasi bawah (*Bottom Navigation Bar*):
 1. **Transaksi**: Arus kas harian, kalender transaksi, ringkasan per bulan, dan entri transaksi.
@@ -84,7 +82,7 @@ Finku terbagi ke dalam 4 modul utama pada menu navigasi bawah (*Bottom Navigatio
 
 ---
 
-## 🛠️ Struktur Proyek
+## Struktur Proyek
 
 ```text
 lib/
@@ -110,7 +108,7 @@ lib/
     └── lainnya/              # Tab Pengaturan & Menu Tambahan
 ```
 
-## 🚀 Memulai (Instalasi & Pengujian)
+## Memulai (Instalasi & Pengujian)
 
 ### Prasyarat
 - Flutter SDK versi `3.22.0` atau yang lebih baru
@@ -150,7 +148,7 @@ flutter build apk --release
 
 ---
 
-## 📦 Dependensi Utama
+## Dependensi Utama
 
 - [`provider`](https://pub.dev/packages/provider): Manajemen status (*state management*) reaktif
 - [`sqflite`](https://pub.dev/packages/sqflite): Mesin database relasional lokal SQLite
