@@ -56,7 +56,7 @@ class KeuanganApp extends StatelessWidget {
             brightness: Brightness.dark,
             useMaterial3: true,
           ),
-          themeMode: ThemeMode.system,
+          themeMode: AppSettings.instance.themeMode,
           locale: Locale(langCode, langCode == 'id' ? 'ID' : 'US'),
           supportedLocales: const [
             Locale('id', 'ID'),

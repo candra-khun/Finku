@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:keuangan_saku/core/app_settings.dart';
 import 'package:keuangan_saku/core/daily_reminder.dart';
 import 'package:keuangan_saku/core/format.dart';
+import 'package:keuangan_saku/core/theme_preference.dart';
 import 'package:keuangan_saku/core/localization.dart';
 import 'package:keuangan_saku/data/models.dart';
 import 'package:keuangan_saku/features/splash/splash_screen.dart';
@@ -26,6 +27,12 @@ void main() {
   test('pengingat harian hanya muncul saat belum ada transaksi hari ini', () {
     expect(shouldShowDailyTransactionReminder(0), isTrue);
     expect(shouldShowDailyTransactionReminder(1), isFalse);
+  });
+
+  test('preferensi tema memetakan mode terang, gelap, dan sistem', () {
+    expect(AppThemeMode.light.themeMode, ThemeMode.light);
+    expect(AppThemeMode.dark.themeMode, ThemeMode.dark);
+    expect(AppThemeMode.system.themeMode, ThemeMode.system);
   });
 
   test('periode dan tanggal', () {

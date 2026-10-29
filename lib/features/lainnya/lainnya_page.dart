@@ -6,6 +6,7 @@ import '../../core/app_settings.dart';
 import '../../core/format.dart';
 import '../../core/localization.dart';
 import '../../core/security_service.dart';
+import '../../core/theme_preference.dart';
 import '../../data/backup_service.dart';
 import '../../data/repository.dart';
 import '../anggaran/anggaran_page.dart';
@@ -647,6 +648,52 @@ class _LainnyaPageState extends State<LainnyaPage> {
                         color: isDark ? Colors.white12 : Colors.black12),
                     ListTile(
                       leading: CircleAvatar(
+                        backgroundColor:
+                            theme.colorScheme.primary.withValues(alpha: 0.15),
+                        child: Icon(
+                          AppSettings.instance.themePreference ==
+                                  AppThemeMode.dark
+                              ? Icons.dark_mode_outlined
+                              : Icons.brightness_auto_outlined,
+                          color: theme.colorScheme.primary,
+                        ),
+                      ),
+                      title: const Text('Tampilan',
+                          style: TextStyle(fontWeight: FontWeight.w600)),
+                      subtitle: Text(_themeModeLabel(
+                          AppSettings.instance.themePreference)),
+                      trailing: DropdownButtonHideUnderline(
+                        child: DropdownButton<AppThemeMode>(
+                          value: AppSettings.instance.themePreference,
+                          icon: const Icon(Icons.expand_more),
+                          onChanged: (mode) {
+                            if (mode != null) {
+                              AppSettings.instance.setThemeMode(mode);
+                            }
+                          },
+                          items: const [
+                            DropdownMenuItem(
+                              value: AppThemeMode.system,
+                              child: Text('Ikuti sistem'),
+                            ),
+                            DropdownMenuItem(
+                              value: AppThemeMode.light,
+                              child: Text('Mode terang'),
+                            ),
+                            DropdownMenuItem(
+                              value: AppThemeMode.dark,
+                              child: Text('Mode gelap'),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    Divider(
+                        height: 1,
+                        indent: 64,
+                        color: isDark ? Colors.white12 : Colors.black12),
+                    ListTile(
+                      leading: CircleAvatar(
                         backgroundColor: Colors.blue.withValues(alpha: 0.15),
                         child: const Icon(Icons.translate_outlined,
                             color: Colors.blue),
@@ -848,6 +895,14 @@ class _LainnyaPageState extends State<LainnyaPage> {
         ],
       ),
     );
+  }
+
+  String _themeModeLabel(AppThemeMode mode) {
+    return switch (mode) {
+      AppThemeMode.system => 'Ikuti mode sistem',
+      AppThemeMode.light => 'Mode terang',
+      AppThemeMode.dark => 'Mode gelap',
+    };
   }
 
   Widget _sectionTitle(String title, IconData icon) {

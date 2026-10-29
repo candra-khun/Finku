@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'theme_preference.dart';
+
 class CurrencyModel {
   final String code;
   final String name;
@@ -68,6 +70,7 @@ class AppSettings extends ChangeNotifier {
   static const _kCurrencyCode = 'app_currency_code';
   static const _kCustomCurrencies = 'app_custom_currencies';
   static const _kOnboardingCompleted = 'app_onboarding_completed';
+  static const _kThemeMode = 'app_theme_mode';
 
   SharedPreferences? _prefs;
   bool _initialized = false;
@@ -173,6 +176,7 @@ class AppSettings extends ChangeNotifier {
   ];
 
   String _languageCode = 'id';
+  AppThemeMode _themeMode = AppThemeMode.system;
   CurrencyModel _currency = defaultCurrencies.first;
   final List<CurrencyModel> _customCurrencies = [];
 
@@ -180,10 +184,13 @@ class AppSettings extends ChangeNotifier {
   bool get isOnboardingCompleted =>
       _prefs?.getBool(_kOnboardingCompleted) ?? false;
   String get languageCode => _languageCode;
+  AppThemeMode get themePreference => _themeMode;
+  ThemeMode get themeMode => _themeMode.themeMode;
   bool get isEnglish => _languageCode == 'en';
   bool get isIndonesian => _languageCode == 'id';
   CurrencyModel get currency => _currency;
-  List<CurrencyModel> get allCurrencies => [...defaultCurrencies, ..._customCurrencies];
+  List<CurrencyModel> get allCurrencies =>
+      [...defaultCurrencies, ..._customCurrencies];
 
   LanguageModel get currentLanguage {
     return supportedLanguages.firstWhere(
@@ -197,6 +204,7 @@ class AppSettings extends ChangeNotifier {
     try {
       _prefs = await SharedPreferences.getInstance();
       _languageCode = _prefs?.getString(_kLanguage) ?? 'id';
+      _themeMode = AppThemeMode.fromStorage(_prefs?.getString(_kThemeMode));
 
       // Load custom currencies
       final customJson = _prefs?.getStringList(_kCustomCurrencies) ?? [];
@@ -233,6 +241,13 @@ class AppSettings extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> setThemeMode(AppThemeMode mode) async {
+    if (_themeMode == mode) return;
+    _themeMode = mode;
+    await _prefs?.setString(_kThemeMode, mode.storageValue);
+    notifyListeners();
+  }
+
   Future<void> setCurrency(CurrencyModel cur) async {
     _currency = cur;
     await _prefs?.setString(_kCurrencyCode, cur.code);
@@ -242,14 +257,16 @@ class AppSettings extends ChangeNotifier {
   Future<void> addCustomCurrency(CurrencyModel model) async {
     _customCurrencies.removeWhere((c) => c.code == model.code);
     _customCurrencies.add(model);
-    final jsonList = _customCurrencies.map((c) => jsonEncode(c.toMap())).toList();
+    final jsonList =
+        _customCurrencies.map((c) => jsonEncode(c.toMap())).toList();
     await _prefs?.setStringList(_kCustomCurrencies, jsonList);
     await setCurrency(model);
   }
 
   Future<void> deleteCustomCurrency(String code) async {
     _customCurrencies.removeWhere((c) => c.code == code);
-    final jsonList = _customCurrencies.map((c) => jsonEncode(c.toMap())).toList();
+    final jsonList =
+        _customCurrencies.map((c) => jsonEncode(c.toMap())).toList();
     await _prefs?.setStringList(_kCustomCurrencies, jsonList);
     if (_currency.code == code) {
       await setCurrency(defaultCurrencies.first);
@@ -309,4 +326,3 @@ class AppSettings extends ChangeNotifier {
     return value.toString();
   }
 }
-
