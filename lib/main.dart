@@ -5,6 +5,7 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:provider/provider.dart';
 
 import 'core/app_settings.dart';
+import 'core/daily_reminder_service.dart';
 import 'core/localization.dart';
 import 'core/security_service.dart';
 import 'core/widget_service.dart';
@@ -80,7 +81,8 @@ class SecurityGuard extends StatefulWidget {
   State<SecurityGuard> createState() => _SecurityGuardState();
 }
 
-class _SecurityGuardState extends State<SecurityGuard> with WidgetsBindingObserver {
+class _SecurityGuardState extends State<SecurityGuard>
+    with WidgetsBindingObserver {
   final _sec = SecurityService.instance;
 
   @override
@@ -97,7 +99,8 @@ class _SecurityGuardState extends State<SecurityGuard> with WidgetsBindingObserv
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.paused || state == AppLifecycleState.hidden) {
+    if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.hidden) {
       _sec.onAppPaused();
     } else if (state == AppLifecycleState.resumed) {
       _sec.onAppResumed();
@@ -136,7 +139,8 @@ class HomeShell extends StatefulWidget {
 }
 
 class _HomeShellState extends State<HomeShell> {
-  static const _widgetChannel = MethodChannel('com.contoh.keuangan_saku/widget');
+  static const _widgetChannel =
+      MethodChannel('com.contoh.keuangan_saku/widget');
   int _index = 0;
 
   @override
@@ -150,7 +154,8 @@ class _HomeShellState extends State<HomeShell> {
         if (processed > 0 && mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('$processed transaksi rutin otomatis telah dicatat'),
+              content:
+                  Text('$processed transaksi rutin otomatis telah dicatat'),
               behavior: SnackBarBehavior.floating,
               backgroundColor: Colors.teal,
             ),
@@ -158,6 +163,7 @@ class _HomeShellState extends State<HomeShell> {
         }
         // Update data ke home screen widget saat app start
         await WidgetService.updateWidgets(repo);
+        await DailyReminderService.schedule();
       } catch (e) {
         debugPrint('Auto recurring / widget sync error: $e');
       }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:keuangan_saku/core/app_settings.dart';
+import 'package:keuangan_saku/core/daily_reminder.dart';
 import 'package:keuangan_saku/core/format.dart';
 import 'package:keuangan_saku/core/localization.dart';
 import 'package:keuangan_saku/data/models.dart';
@@ -22,6 +23,11 @@ void main() {
     expect(ringkas(2000000), '2jt');
   });
 
+  test('pengingat harian hanya muncul saat belum ada transaksi hari ini', () {
+    expect(shouldShowDailyTransactionReminder(0), isTrue);
+    expect(shouldShowDailyTransactionReminder(1), isFalse);
+  });
+
   test('periode dan tanggal', () {
     expect(ymd(DateTime(2026, 10, 7)), '2026-10-07');
     expect(periodOf(DateTime(2026, 10, 27)), '2026-10');
@@ -30,7 +36,8 @@ void main() {
   });
 
   test('perhitungan anggaran per kategori', () {
-    const cat = Category(id: 1, name: 'Makanan', type: 'expense', color: 0xFF00FF00);
+    const cat =
+        Category(id: 1, name: 'Makanan', type: 'expense', color: 0xFF00FF00);
     const bNormal = CategoryBudget(
       category: cat,
       budgetAmount: 2000000,
